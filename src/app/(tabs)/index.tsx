@@ -39,13 +39,14 @@ export default function HomeScreen() {
         <ThemedView style={styles.heroSection}>
           <AnimatedIcon />
           <ThemedText type="title" style={styles.title}>
-            Acuity
+            welcome to bp brother
           </ThemedText>
         </ThemedView>
 
         
 
         <Button title="srishanth go here" onPress={() => router.navigate('/gamePages/gametemp')} />
+        <Button title="example" onPress={() => router.navigate('/(auth)/intro')} />
 
         {Platform.OS === 'web' && <WebBadge />}
       </SafeAreaView>
