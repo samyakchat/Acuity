@@ -9,7 +9,8 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon",
-      "bundleIdentifier": "com.duck2099.sas"
+      "bundleIdentifier": "com.duck2099.sas",
+      "appleTeamId": "89GXCR7W89"
     },
     "android": {
       "adaptiveIcon": {
@@ -34,7 +35,9 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
-      ]
+      ],
+      "expo-sqlite",
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true,

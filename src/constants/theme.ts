@@ -5,19 +5,20 @@
 
 import '@/global.css';
 
-import { Platform } from 'react-native';
+import { Platform, useColorScheme } from 'react-native';
+
 
 export const Colors = {
   light: {
     text: '#000000',
-    background: '#ffffff',
+    background: '#f1f5f8',
     backgroundElement: '#F0F0F3',
     backgroundSelected: '#E0E1E6',
     textSecondary: '#60646C',
   },
   dark: {
     text: '#ffffff',
-    background: '#000000',
+    background: '#111c20',
     backgroundElement: '#212225',
     backgroundSelected: '#2E3135',
     textSecondary: '#B0B4BA',
@@ -63,3 +64,14 @@ export const Spacing = {
 
 export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;
 export const MaxContentWidth = 800;
+
+export const C = {
+  primary: '#2A9DC3',
+  ink: '#2B2B2B',
+  inkSoft: '#5A5A5A',
+  line: '#E0E0E0',
+  white: '#FFFFFF',
+  error: '#C62828',
+  errorTint: '#FDECEA',
+  darkerrorTint: '#FDECEA',
+};
