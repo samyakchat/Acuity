@@ -3,8 +3,10 @@ import { useTheme } from "@/components/fatUI/theme";
 import FatButton from "./fatButton";
 import { ChevronLeft } from "lucide-react-native";
 import { useRouter } from "expo-router";
-
-export default function FatHeader() {
+type Props = {
+  backgroundColor?: string;
+};
+export default function FatHeader({backgroundColor}: Props) {
   const theme = useTheme();
   const router = useRouter();
   return (
@@ -14,7 +16,7 @@ export default function FatHeader() {
     justifyContent: 'flex-start',
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: theme.background,
+    backgroundColor: backgroundColor || theme.background,
    }}>
      <FatButton
             text=""

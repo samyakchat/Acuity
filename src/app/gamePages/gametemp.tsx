@@ -1,27 +1,25 @@
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 import SeenIt from "@/components/games/SeenItGame/seenIt";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
-
+import FatHeader from "@/components/fatUI/fatHeader";
+import { useTheme } from "@/components/fatUI/theme";
 export default function GameTemp() {
+  const theme = useTheme();
   return (
-    <ThemedView style={styles.container}>
+
+    <ThemedView style={[styles.container, {backgroundColor: theme.primary}]}>
       <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <ThemedText type="title" style={styles.title}>
-            game section
-          </ThemedText>
+        <FatHeader backgroundColor={theme.primary}/>
+
+        <ThemedView style={[styles.heroSection, {backgroundColor: theme.primary}]}> 
 
           <SeenIt />
         </ThemedView>
 
-        <ThemedText type="code" style={styles.code}>
-          game should take majority of screen and not look like a web preview or
-          smth, but fit naturally:)
-        </ThemedText>
+       
       </SafeAreaView>
     </ThemedView>
   );
@@ -35,7 +33,6 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    alignItems: "center",
     gap: Spacing.three,
     paddingBottom: BottomTabInset + Spacing.three,
     maxWidth: MaxContentWidth,
@@ -45,7 +42,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     flex: 1,
     alignSelf: "stretch",
-    gap: Spacing.four,
   },
   title: {
     textAlign: "center",

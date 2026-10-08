@@ -3,9 +3,14 @@ import { ThemedView } from "@/components/themed-view";
 import { Spacing } from "@/constants/theme";
 import { useRef, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
-
+import { FONT } from '@/components/fatUI/theme';
+import {useTheme} from "@/components/fatUI/theme";
 import { WORDS } from "./word-list";
-
+import FatButton from "@/components/fatUI/fatButton";
+import { Eye, BadgePlus} from "lucide-react-native";
+import { Image } from "expo-image";
+import { Text } from "react-native";
+import FatSheet from "@/components/fatUI/fatSheet";
 const chosen: string[] = [];
 let buttonCounter: number = 0;
 let seen: boolean = false;
@@ -65,6 +70,8 @@ export function chooseWord(): string {
 }
 
 export default function SeenIt() {
+  const [open, setOpen] = useState(false);
+  const theme = useTheme();
   const startedAt = useRef<number | null>(null);
   const [hasStarted, setHasStarted] = useState(false);
   const [currentWord, setCurrentWord] = useState("");
@@ -124,37 +131,48 @@ export default function SeenIt() {
 
   if (!hasStarted) {
     return (
-      <ThemedView style={[styles.container, styles.instructionsContainer]}>
-        <ThemedText type="title" style={[styles.title, styles.resultsTitle]}>
-          How to Play
-        </ThemedText>
-
-        <ThemedText style={styles.instructionsText}>
-          You will see a series of words show up on the screen. For each word,
-          select &quot;Seen It&quot; if the word has already been displayed in this
-          round, and select &quot;New&quot; if the word has not yet.
-        </ThemedText>
-
-        <View style={styles.continueButtonContainer}>
-          <View pointerEvents="none" style={styles.buttonShadow} />
-          <Pressable
-            accessibilityRole="button"
-            onPress={onContinueClicked}
-            style={({ pressed }) => [
-              styles.gameButton,
-              pressed && styles.gameButtonPressed,
-            ]}
-          >
-            <ThemedText style={styles.buttonText}>Continue</ThemedText>
-          </Pressable>
+      <View style={[styles.container, styles.instructionsContainer,
+        { backgroundColor: theme.primary, flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 20}]}>
+          <FatSheet
+            visible={open}
+            onDismiss={() => setOpen(false)}
+            title="How to play"
+            message="You will see a word on the screen. Your decide if you have seen this word before in the game or if it's new. If you have seen it, press 'Seen It'. If it's new, press 'New'."
+            buttonText="Got it"
+            buttonType="secondary"
+          />
+        <View style={styles.titleGroup}>
+          <Text style={[styles.subtitle, { color: theme.background }]}>
+            Welcome to your daily game
+          </Text>
+          <Text style={[styles.title, { color: theme.background }]}>
+            Have I Seen It?
+          </Text>
         </View>
-      </ThemedView>
-    );
-  }
+        <Image source={require('@/assets/mochi_stale/mochi_think.svg')} 
+              style={{ width: 210, height: 300, alignSelf: 'center', objectFit: 'contain' }} 
+          />
+        <View style={styles.inlineButtonContainer}>
+          <FatButton
+            onPress={() => setOpen(true)}
+            text="HOW TO PLAY?"
+            type="secondary"
+            size="small"
+          />
+          <FatButton
+            onPress={onContinueClicked}
+            text="I KNOW HOW TO PLAY"
+            type="secondary"
+            size="small"
+          />
+        </View>
+      </View>
+      );
+    }
 
   if (gameStats) {
     return (
-      <ThemedView style={[styles.container, styles.resultsContainer]}>
+      <ThemedView style={[styles.container, styles.resultsContainer, { backgroundColor: theme.primary }]}>
         <ThemedText type="title" style={[styles.title, styles.resultsTitle]}>
           Game Complete!
         </ThemedText>
@@ -184,44 +202,25 @@ export default function SeenIt() {
       <ThemedText type="title" style={styles.title}>
         Seen It
       </ThemedText>
-      <ThemedView style={styles.progressTrack}>
+      <ThemedView style={[styles.progressTrack]}>
         <ThemedView
-          style={[styles.progressFill, { width: progressWidth }]}
+          style={[styles.progressFill, { width: progressWidth, backgroundColor: theme.primary }]}
         ></ThemedView>
       </ThemedView>
 
-      <ThemedView style={styles.gameArea}>
+      <ThemedView style={[styles.gameArea, { backgroundColor: theme.primary }]}>
         <ThemedText type="subtitle" style={styles.word}>
           {currentWord}
         </ThemedText>
 
         <View style={styles.buttonRow}>
           <View style={styles.buttonContainer}>
-            <View pointerEvents="none" style={styles.buttonShadow} />
-            <Pressable
-              accessibilityRole="button"
-              onPress={onSeenClicked}
-              style={({ pressed }) => [
-                styles.gameButton,
-                pressed && styles.gameButtonPressed,
-              ]}
-            >
-              <ThemedText style={styles.buttonText}>Seen It</ThemedText>
-            </Pressable>
+            <FatButton onPress={onSeenClicked} text="Seen It" type="secondary" size="small" icon={Eye}/>
+            
           </View>
 
           <View style={styles.buttonContainer}>
-            <View pointerEvents="none" style={styles.buttonShadow} />
-            <Pressable
-              accessibilityRole="button"
-              onPress={onNewClicked}
-              style={({ pressed }) => [
-                styles.gameButton,
-                pressed && styles.gameButtonPressed,
-              ]}
-            >
-              <ThemedText style={styles.buttonText}>New</ThemedText>
-            </Pressable>
+            <FatButton onPress={onNewClicked} text="New" type="secondary" size="small" icon={BadgePlus}/>
           </View>
         </View>
       </ThemedView>
@@ -249,7 +248,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     overflow: "hidden",
     borderRadius: 9,
-    backgroundColor: "rgb(0, 166, 255)",
   },
   gameArea: {
     flex: 1,
@@ -257,7 +255,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     paddingTop: Spacing.four,
     gap: Spacing.four,
-    backgroundColor: "rgb(0, 166, 255)",
   },
   word: {
     color: "#FFFFFF",
@@ -276,61 +273,27 @@ const styles = StyleSheet.create({
     height: 63,
     position: "relative",
   },
-  buttonShadow: {
-    position: "absolute",
-    right: 0,
-    bottom: 0,
-    left: 0,
-    height: "75%",
-    borderRadius: 16,
-    backgroundColor: "rgb(0, 126, 194)",
-  },
-  gameButton: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    left: 0,
-    height: 58,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: Spacing.two,
-    borderRadius: 16,
-    backgroundColor: "#FFFFFF",
-  },
-  gameButtonPressed: {
-    transform: [{ translateY: 5 }],
-  },
-  buttonText: {
-    color: "rgb(0, 126, 194)",
-    fontSize: 16,
-    fontWeight: "700",
-    textAlign: "center",
-  },
+
   resultsContainer: {
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: Spacing.four,
-    backgroundColor: "rgb(0, 166, 255)",
   },
   instructionsContainer: {
-    alignItems: "center",
     justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: Spacing.four,
-    backgroundColor: "rgb(0, 166, 255)",
   },
   instructionsText: {
     maxWidth: 560,
     color: "#FFFFFF",
-    fontSize: 18,
-    lineHeight: 27,
     textAlign: "center",
+    fontFamily: FONT.body,
+    fontSize: 20,
+    lineHeight: 28,
   },
   continueButtonContainer: {
-    position: "relative",
-    width: "100%",
-    maxWidth: 280,
-    height: 63,
-    marginTop: Spacing.three,
+    position: "relative", width: "100%", maxWidth: 280, height: 63, marginTop: Spacing.three, gap: 30
   },
   statsCard: {
     width: "100%",
@@ -355,5 +318,23 @@ const styles = StyleSheet.create({
   },
   title: {
     textAlign: "center",
+    fontFamily: FONT.title,
+    fontSize: 40,
+    lineHeight: 48,
+  },
+  subtitle: {
+    textAlign: "center",
+    fontFamily: FONT.body,
+    fontSize: 20,
+    lineHeight: 28,
+  },
+  titleGroup: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+  },
+  inlineButtonContainer: {
+    flexDirection: 'column',
+   
+    gap: 16, 
   },
 });
