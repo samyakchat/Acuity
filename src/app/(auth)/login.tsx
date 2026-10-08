@@ -26,35 +26,6 @@ import { useTheme } from '@/components/fatUI/theme';
 import { FONT } from '@/components/fatUI/theme';
 import FatHeader from '@/components/fatUI/fatHeader';
 
-function Reveal({index, children}: {
-  index: number;
-  children: React.ReactNode;
-}) {
-  const v = useRef(new Animated.Value(0)).current;
-  useEffect(() => {
-
-    Animated.timing(v, {
-      toValue: 1,
-      duration: 380,
-      delay: 80 + index * 90,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: true,
-    }).start();
-  }, [index, v]);
-
-  return (
-    <Animated.View
-      style={{
-        opacity: v,
-        transform: [{ translateY: v.interpolate({ inputRange: [0, 1], outputRange: [18, 0] }) }],
-      }}
-    >
-      {children}
-    </Animated.View>
-  );
-}
-
-
 type Props = {
   onLogin: (username: string, password: string) => Promise<void>;
   onOpenPrivacy: () => void;
@@ -123,7 +94,6 @@ export default function LoginScreen({ onLogin, onOpenPrivacy, onOpenTerms }: Pro
           style={{ flex: 1 }}
         >
           <View style={styles.column}>
-            <Reveal index={0} >
               <View style={styles.header}>
                 
                 <Text style={[styles.title, {color: theme.text}]} accessibilityRole="header">
@@ -131,10 +101,8 @@ export default function LoginScreen({ onLogin, onOpenPrivacy, onOpenTerms }: Pro
                 </Text>
                 <Text style={[styles.subtitle, {color: theme.textSoft}]}>Sign in as a caretaker or patient</Text>
               </View>
-            </Reveal>
 
             {/* Form */}
-            <Reveal index={1}>
               <Animated.View style={{ gap: 20, transform: [{ translateX: shakeX }] }}>
                 <FatInput 
                     label="Username"
@@ -166,14 +134,10 @@ export default function LoginScreen({ onLogin, onOpenPrivacy, onOpenTerms }: Pro
                   </View>
                 )}
               </Animated.View>
-            </Reveal>
 
-            <Reveal index={2} >
               <FatButton text="Log in" icon={LogIn} type="primary" onPress={submit} loading={loading} loadingText="Logging in…" size='small'/>
 
-            </Reveal>
 
-            <Reveal index={3} >
               <View style={styles.policyRow}>
                 <FatButton text="Privacy Policy" 
                     icon={ShieldCheck} 
@@ -192,7 +156,6 @@ export default function LoginScreen({ onLogin, onOpenPrivacy, onOpenTerms }: Pro
                 />
          
               </View>
-            </Reveal>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

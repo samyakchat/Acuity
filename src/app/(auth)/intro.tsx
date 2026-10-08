@@ -7,16 +7,12 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  FileText,
-  LogIn,
-  ShieldCheck,
-} from 'lucide-react-native';
 import FatButton from '@/components/fatUI/fatButton';
 import { useTheme } from '@/components/fatUI/theme';
 import { FONT } from '@/components/fatUI/theme';
 import FatHeader from '@/components/fatUI/fatHeader';
 import {useRouter} from 'expo-router';
+import { Image } from 'expo-image';
 
 type Props = {
   onLogin: (username: string, password: string) => Promise<void>;
@@ -57,6 +53,11 @@ export default function LoginScreen({ onLogin, onOpenPrivacy, onOpenTerms }: Pro
                 </Text>
                 <Text style={[styles.subtitle, {color: theme.textSoft}]}>Acuity's smartest Axolotl</Text>
               </View>
+            <View style={{ gap: 16, marginTop: 26 }}>
+                <Image source={require('@/assets/mochi_stale/mochi_front_happy.svg')} 
+                    style={{ width: 210, height: 300, alignSelf: 'center', objectFit: 'contain' }} 
+                />
+            </View>
           <View style={styles.column}>
             <View style={{ gap: 16, bottom: 16 }}>
               <FatButton text="JOIN NOW" type="primary" onPress={() => {leadToPage("/signup")}} size='small'/>

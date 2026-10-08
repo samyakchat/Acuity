@@ -26,33 +26,7 @@ import { useTheme } from '@/components/fatUI/theme';
 import { FONT } from '@/components/fatUI/theme';
 import FatHeader from '@/components/fatUI/fatHeader';
 
-function Reveal({index, children}: {
-  index: number;
-  children: React.ReactNode;
-}) {
-  const v = useRef(new Animated.Value(0)).current;
-  useEffect(() => {
 
-    Animated.timing(v, {
-      toValue: 1,
-      duration: 380,
-      delay: 80 + index * 90,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: true,
-    }).start();
-  }, [index, v]);
-
-  return (
-    <Animated.View
-      style={{
-        opacity: v,
-        transform: [{ translateY: v.interpolate({ inputRange: [0, 1], outputRange: [18, 0] }) }],
-      }}
-    >
-      {children}
-    </Animated.View>
-  );
-}
 
 
 type Props = {
@@ -144,18 +118,14 @@ export default function LoginScreen({ onLogin}: Props) {
           style={{ flex: 1 }}
         >
           <View style={styles.column}>
-            <Reveal index={0} >
               <View style={styles.header}>
                 
                 <Text style={[styles.title, {color: theme.text}]} accessibilityRole="header">
-                  Welcome back
+                  Hey there!
                 </Text>
-                <Text style={[styles.subtitle, {color: theme.textSoft}]}>Sign in as a caretaker or patient</Text>
+                <Text style={[styles.subtitle, {color: theme.textSoft}]}>If you have no caretaker, pick Patient.</Text>
               </View>
-            </Reveal>
 
-            {/* Form */}
-            <Reveal index={1}>
               <Animated.View style={{ gap: 20, transform: [{ translateX: shakeX }] }}>
                 <FatInput 
                     label="Username"
@@ -198,9 +168,7 @@ export default function LoginScreen({ onLogin}: Props) {
                   </View>
                 )}
               </Animated.View>
-            </Reveal>
 
-            <Reveal index={3} >
               <View style={styles.policyRow}>
                 <FatButton 
                     text="CARETAKER" 
@@ -223,12 +191,9 @@ export default function LoginScreen({ onLogin}: Props) {
 
          
               </View>
-            </Reveal>
 
-            <Reveal index={2} >
               <FatButton text="JOIN NOW" icon={LogIn} type="primary" onPress={submit} loading={loading} loadingText="Logging in…" size='small'/>
 
-            </Reveal>
 
             
           </View>

@@ -30,10 +30,8 @@ export default function RootLayout() {
       <Stack
         screenOptions={{
           headerShown: false,
-          
         }}
       />
-
       <AnimatedSplashOverlay />
     </ThemeProvider>
   );
