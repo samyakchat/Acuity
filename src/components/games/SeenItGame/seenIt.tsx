@@ -1,8 +1,7 @@
 import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
 import { Spacing } from "@/constants/theme";
 import { useRef, useState } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { StyleSheet, View, Animated } from "react-native";
 import { FONT } from '@/components/fatUI/theme';
 import {useTheme} from "@/components/fatUI/theme";
 import { WORDS } from "./word-list";
@@ -11,6 +10,8 @@ import { Eye, BadgePlus} from "lucide-react-native";
 import { Image } from "expo-image";
 import { Text } from "react-native";
 import FatSheet from "@/components/fatUI/fatSheet";
+import { getDefinition } from "@/components/games/SeenItGame/word-list";
+
 const chosen: string[] = [];
 let buttonCounter: number = 0;
 let seen: boolean = false;
@@ -71,6 +72,7 @@ export function chooseWord(): string {
 
 export default function SeenIt() {
   const [open, setOpen] = useState(false);
+  const [defOpen, setDefOpen] = useState(false);
   const theme = useTheme();
   const startedAt = useRef<number | null>(null);
   const [hasStarted, setHasStarted] = useState(false);
@@ -81,6 +83,53 @@ export default function SeenIt() {
     incorrect: number;
   } | null>(null);
   const [answeredCount, setAnsweredCount] = useState(0);
+
+  const slideAnim = useRef(new Animated.Value(0)).current;
+  const opacityAnim = useRef(new Animated.Value(1)).current;
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const isAnimating = useRef(false);
+
+  function animateToNextWord(nextWordCallback: () => void) {
+    isAnimating.current = true;
+    Animated.parallel([
+      Animated.timing(slideAnim, {
+        toValue: 50,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacityAnim, {
+        toValue: 0,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 0.9,
+        duration: 150,
+        useNativeDriver: true,
+      })
+    ]).start(() => {
+      nextWordCallback();
+      Animated.parallel([
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacityAnim, {
+          toValue: 1,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 150,
+          useNativeDriver: true,
+        })
+      ]).start(() => {
+        isAnimating.current = false;
+      });
+    });
+  }
 
   function onContinueClicked() {
     chosen.length = 0;
@@ -93,10 +142,15 @@ export default function SeenIt() {
     startedAt.current = Date.now();
     setCurrentWord(chooseWord());
     setHasStarted(true);
+    
+    slideAnim.setValue(0);
+    opacityAnim.setValue(1);
+    scaleAnim.setValue(1);
+    isAnimating.current = false;
   }
 
   function handleAnswer(clickedSeen: boolean) {
-    if (buttonCounter >= 30 || gameStats) {
+    if (buttonCounter >= 30 || gameStats || isAnimating.current) {
       return;
     }
 
@@ -118,7 +172,9 @@ export default function SeenIt() {
       return;
     }
 
-    setCurrentWord(chooseWord());
+    animateToNextWord(() => {
+      setCurrentWord(chooseWord());
+    });
   }
 
   function onSeenClicked() {
@@ -127,6 +183,10 @@ export default function SeenIt() {
 
   function onNewClicked() {
     handleAnswer(false);
+  }
+
+  function onDefClicked() {
+    setDefOpen(true);
   }
 
   if (!hasStarted) {
@@ -141,6 +201,7 @@ export default function SeenIt() {
             buttonText="Got it"
             buttonType="secondary"
           />
+          
         <View style={styles.titleGroup}>
           <Text style={[styles.subtitle, { color: theme.background }]}>
             Welcome to your daily game
@@ -161,7 +222,7 @@ export default function SeenIt() {
           />
           <FatButton
             onPress={onContinueClicked}
-            text="I KNOW HOW TO PLAY"
+            text="START GAME"
             type="secondary"
             size="small"
           />
@@ -171,60 +232,79 @@ export default function SeenIt() {
     }
 
   if (gameStats) {
+    console.log("Game stats:", gameStats);
     return (
-      <ThemedView style={[styles.container, styles.resultsContainer, { backgroundColor: theme.primary }]}>
-        <ThemedText type="title" style={[styles.title, styles.resultsTitle]}>
-          Game Complete!
-        </ThemedText>
-
-        <View style={styles.statsCard}>
-          <ThemedText type="subtitle" style={styles.statsHeading}>
-            Your Stats
-          </ThemedText>
-          <ThemedText style={styles.statText}>
-            Time taken: {gameStats.timeTaken.toFixed(1)} seconds
-          </ThemedText>
-          <ThemedText style={styles.statText}>
-            Correct: {gameStats.correct}
-          </ThemedText>
-          <ThemedText style={styles.statText}>
-            Incorrect: {gameStats.incorrect}
-          </ThemedText>
-        </View>
-      </ThemedView>
+      <View style={[styles.container, styles.resultsContainer, { backgroundColor: theme.primary }]}>
+        <Text style={[styles.title, styles.resultsTitle, { color: theme.background }]}>
+          Great Work!
+        </Text>
+        <Text style={[styles.subtitle, { color: theme.background }]}>
+            Let's move on to the next game!
+          </Text>
+        <Image source={require('@/assets/mochi_stale/mochi_celebrate.svg')} 
+              style={{ width: 210, height: 300, alignSelf: 'center', objectFit: 'contain' }} 
+          />
+      </View>
     );
   }
 
   const progressWidth = `${(answeredCount / 30) * 100}%` as `${number}%`;
 
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="title" style={styles.title}>
-        Seen It
-      </ThemedText>
-      <ThemedView style={[styles.progressTrack]}>
-        <ThemedView
-          style={[styles.progressFill, { width: progressWidth, backgroundColor: theme.primary }]}
-        ></ThemedView>
-      </ThemedView>
+    <View style={styles.container}>
+      <FatSheet
+            visible={defOpen}
+            onDismiss={() => setDefOpen(false)}
+            title={currentWord}
+            message={getDefinition(currentWord)}
+            buttonText="Thanks!"
+            buttonType="secondary"
+          />
 
-      <ThemedView style={[styles.gameArea, { backgroundColor: theme.primary }]}>
-        <ThemedText type="subtitle" style={styles.word}>
-          {currentWord}
-        </ThemedText>
+      <View style={[styles.gameArea, { backgroundColor: theme.primary }]}>
+        <Text style={[styles.subtitle, { color: theme.background }]}>
+            Your word is...
+          </Text>
+          
+        <Animated.View style={{ 
+          width: "100%", 
+          alignItems: "center",
+          opacity: opacityAnim,
+          transform: [
+            { translateY: slideAnim },
+            { scale: scaleAnim }
+          ]
+        }}>
+          <FatButton
+            text={currentWord}
+            type="primary"
+            size="large"
+            style={{ width: "80%" }}
+            onPress={() => onDefClicked()}
+          />
+        </Animated.View>
+        
+      </View>
+      <View style={{ width: "100%", gap: 32, paddingBottom: 32 }}>
+        <View>
+          <View style={styles.buttonRow}>
+              <View style={styles.buttonContainer}>
+                <FatButton onPress={onSeenClicked} text="Seen It" type="secondary" size="small" icon={Eye}/>
+                
+              </View>
 
-        <View style={styles.buttonRow}>
-          <View style={styles.buttonContainer}>
-            <FatButton onPress={onSeenClicked} text="Seen It" type="secondary" size="small" icon={Eye}/>
-            
+              <View style={styles.buttonContainer}>
+                <FatButton onPress={onNewClicked} text="New" type="secondary" size="small" icon={BadgePlus}/>
+              </View>
+            </View>
           </View>
-
-          <View style={styles.buttonContainer}>
-            <FatButton onPress={onNewClicked} text="New" type="secondary" size="small" icon={BadgePlus}/>
-          </View>
+        <View style={[styles.progressTrack, {backgroundColor: theme.primaryEdge}]}>
+          <View
+            style={[styles.progressFill, { width: progressWidth, backgroundColor: theme.background }]}
+          ></View>
         </View>
-      </ThemedView>
-    </ThemedView>
+      </View>
+    </View>
   );
 }
 
@@ -272,8 +352,8 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 63,
     position: "relative",
+    justifyContent: "flex-end",
   },
-
   resultsContainer: {
     alignItems: "center",
     justifyContent: "center",
@@ -283,17 +363,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: Spacing.four,
-  },
-  instructionsText: {
-    maxWidth: 560,
-    color: "#FFFFFF",
-    textAlign: "center",
-    fontFamily: FONT.body,
-    fontSize: 20,
-    lineHeight: 28,
-  },
-  continueButtonContainer: {
-    position: "relative", width: "100%", maxWidth: 280, height: 63, marginTop: Spacing.three, gap: 30
   },
   statsCard: {
     width: "100%",
@@ -334,7 +403,7 @@ const styles = StyleSheet.create({
   },
   inlineButtonContainer: {
     flexDirection: 'column',
-   
+    width: '80%',
     gap: 16, 
   },
 });
