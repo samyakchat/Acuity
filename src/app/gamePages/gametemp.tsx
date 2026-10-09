@@ -1,27 +1,29 @@
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import SeenIt from "@/components/games/SeenItGame/seenIt";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
 import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
 import FatHeader from "@/components/fatUI/fatHeader";
 import { useTheme } from "@/components/fatUI/theme";
-export default function GameTemp() {
+import { View } from "react-native";
+import { useLocalSearchParams } from "expo-router";
+
+export const registry = {
+  "seenIt-10987": SeenIt,
+}
+
+export default function GameLoader() {
   const theme = useTheme();
+  const { gameID, primaryColor} = useLocalSearchParams();
+  const RunningGame = registry[gameID as keyof typeof registry];
   return (
-
-    <ThemedView style={[styles.container, {backgroundColor: theme.primary}]}>
+    <View style={[styles.container, {backgroundColor: primaryColor as string}]}>
       <SafeAreaView style={styles.safeArea}>
-        <FatHeader backgroundColor={theme.primary}/>
-
-        <ThemedView style={[styles.heroSection, {backgroundColor: theme.primary}]}> 
-
-          <SeenIt />
-        </ThemedView>
-
-       
+        <FatHeader backgroundColor={primaryColor as string}/>
+        <View style={[styles.heroSection, {backgroundColor: primaryColor as string}]}> 
+          <RunningGame />
+        </View>
       </SafeAreaView>
-    </ThemedView>
+    </View>
   );
 }
 

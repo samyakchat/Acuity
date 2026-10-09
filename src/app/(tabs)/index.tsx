@@ -1,7 +1,7 @@
 import * as Device from 'expo-device';
 import { Platform, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
+import {useTheme} from '@/components/fatUI/theme';
 import { AnimatedIcon } from '@/components/animated-icon';
 import { HintRow } from '@/components/hint-row';
 import { ThemedText } from '@/components/themed-text';
@@ -11,27 +11,8 @@ import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { Button } from 'react-native';
 import { useRouter } from 'expo-router';
 
-function getDevMenuHint() {
-  
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
-  return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
-
 export default function HomeScreen() {
+  const theme = useTheme();
   const router = useRouter();
   return (
     <ThemedView style={styles.container}>
@@ -39,16 +20,21 @@ export default function HomeScreen() {
         <ThemedView style={styles.heroSection}>
           <AnimatedIcon />
           <ThemedText type="title" style={styles.title}>
-            welcome to bp brother
+            acuity base delete soon
           </ThemedText>
         </ThemedView>
 
         
 
-        <Button title="srishanth go here" onPress={() => router.navigate('/gamePages/gametemp')} />
+        <Button title="seen it game finished" onPress={() => 
+            router.push({
+              pathname: '/gamePages/gametemp', 
+              params: {gameID: "seenIt-10987", primaryColor: theme.primary} 
+            })} 
+          />
         <Button title="example" onPress={() => router.navigate('/(auth)/intro')} />
 
-        {Platform.OS === 'web' && <WebBadge />}
+
       </SafeAreaView>
     </ThemedView>
   );
@@ -78,14 +64,5 @@ const styles = StyleSheet.create({
   title: {
     textAlign: 'center',
   },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
-  },
+
 });
