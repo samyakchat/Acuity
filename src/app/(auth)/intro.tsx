@@ -40,7 +40,6 @@ export default function LoginScreen({ onLogin, onOpenPrivacy, onOpenTerms }: Pro
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <FatHeader/>
         <ScrollView
           contentContainerStyle={styles.scroll}
           keyboardShouldPersistTaps="handled"
@@ -72,7 +71,7 @@ export default function LoginScreen({ onLogin, onOpenPrivacy, onOpenTerms }: Pro
 
 const styles = StyleSheet.create({
   screen: { flex: 1},
-  scroll: { flexGrow: 1, justifyContent: 'center', padding: 24, paddingBottom: 32 },
+  scroll: { flexGrow: 1, justifyContent: 'center', padding: 24, paddingBottom: 32, marginTop: 64 },
   column: { width: '100%', maxWidth: 480, alignSelf: 'center', gap: 28, justifyContent: 'flex-end', flex: 1 },
 
   header: { alignItems: 'center', gap: 10, marginTop: 32 },

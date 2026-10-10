@@ -19,12 +19,14 @@ import {
   LogIn,
   ShieldCheck,
   User,
+  AtSign
 } from 'lucide-react-native';
 import FatButton from '@/components/fatUI/fatButton';
 import FatInput from '@/components/fatUI/fatInput';
 import { useTheme } from '@/components/fatUI/theme';
 import { FONT } from '@/components/fatUI/theme';
 import FatHeader from '@/components/fatUI/fatHeader';
+import { supabase } from '@/lib/supabase';
 
 
 
@@ -42,6 +44,7 @@ export default function LoginScreen({ onLogin}: Props) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [passconfirm, setPassconfirm] = useState('');
+  const [fullname, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -69,36 +72,33 @@ export default function LoginScreen({ onLogin}: Props) {
       fail('Please enter your username and password.');
       return;
     }
-    if (password !== passconfirm) {
-      fail('Passwords do not match.');
-      return;
-    }
     if (!role) {
       fail('Please select a role.');
       return;
     }
     setError(null);
     setLoading(true);
-    try {
-      await onLogin(username.trim(), password);
-    } catch {
-      fail("That username or password isn't right. Please check them and try again.");
-    } finally {
-      setLoading(false);
+    const { error } = await supabase.auth.signUp({
+        email: username.trim(),
+        password: password,
+        options: {
+          data: {
+            role: role,
+            full_name: fullname
+          }
+
+        }
+
+    });
+    setLoading(false);
+    if (error) {
+        fail(error.message);
+        console.log(error.message)
+        return;
     }
+
+    alert("Thank you for joining Acuity!");
   };
-
-  function checkPasswordMatch() {
-    if (password !== passconfirm) {
-      setError("Passwords do not match.");
-    } else {
-      setError(null);
-    }
-  }
-
-  useEffect(() => {
-    checkPasswordMatch();
-  }, [password, passconfirm]);
 
 
   return (
@@ -128,12 +128,12 @@ export default function LoginScreen({ onLogin}: Props) {
 
               <Animated.View style={{ gap: 20, transform: [{ translateX: shakeX }] }}>
                 <FatInput 
-                    label="Username"
-                    icon={User} 
+                    label="Email"
+                    icon={AtSign} 
                     value={username} 
                     onChangeText={setUsername}
                     autoCapitalize="none" 
-                    autoComplete="username" 
+                    autoComplete="email" 
                     returnKeyType="next"
                     onSubmitEditing={() => passwordRef.current?.focus()} 
                     size='small'
@@ -149,13 +149,12 @@ export default function LoginScreen({ onLogin}: Props) {
                     size="small"
                 />
 
+
                 <FatInput
-                    label="Confirm Password"
-                    icon={Lock}
-                    type="password"
-                    value={passconfirm}
-                    onChangeText={setPassconfirm}
-                    onSubmitEditing={submit}
+                    label="Full Name"
+                    icon={User}
+                    value={fullname}
+                    onChangeText={setFullName}
                     size="small"
                 />
 

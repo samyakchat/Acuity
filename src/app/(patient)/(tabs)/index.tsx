@@ -1,15 +1,15 @@
-import * as Device from 'expo-device';
 import { Platform, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {useTheme} from '@/components/fatUI/theme';
 import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { Button } from 'react-native';
 import { useRouter } from 'expo-router';
+import { LogOut } from 'lucide-react-native';
+import FatButton from '@/components/fatUI/fatButton';
+import { supabase } from '@/lib/supabase';
 
 export default function HomeScreen() {
   const theme = useTheme();
@@ -28,11 +28,18 @@ export default function HomeScreen() {
 
         <Button title="seen it game finished" onPress={() => 
             router.push({
-              pathname: '/gamePages/gametemp', 
+              pathname: '/(patient)/gamePages/gametemp', 
               params: {gameID: "seenIt-10987", primaryColor: theme.primary} 
             })} 
           />
-        <Button title="example" onPress={() => router.navigate('/(auth)/intro')} />
+
+        <FatButton
+          text="Log out"
+          icon={LogOut}
+          type="secondary"
+          size="small"
+          onPress={() => supabase.auth.signOut()}
+        />
 
 
       </SafeAreaView>

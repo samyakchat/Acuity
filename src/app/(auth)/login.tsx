@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
+  AtSign,
   CircleAlert,
   FileText,
   Lock,
@@ -25,6 +26,7 @@ import FatInput from '@/components/fatUI/fatInput';
 import { useTheme } from '@/components/fatUI/theme';
 import { FONT } from '@/components/fatUI/theme';
 import FatHeader from '@/components/fatUI/fatHeader';
+import { supabase } from '@/lib/supabase';
 
 type Props = {
   onLogin: (username: string, password: string) => Promise<void>;
@@ -59,22 +61,34 @@ export default function LoginScreen({ onLogin, onOpenPrivacy, onOpenTerms }: Pro
     shake();
   };
 
+
   const submit = async () => {
     if (loading) return;
+
     if (!username.trim() || !password) {
       fail('Please enter your username and password.');
       return;
     }
+
     setError(null);
     setLoading(true);
-    try {
-      await onLogin(username.trim(), password);
-    } catch {
-      fail("That username or password isn't right. Please check them and try again.");
-    } finally {
-      setLoading(false);
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email: username.trim(),
+      password: password,
+    });
+
+    setLoading(false);
+
+    if (error) {
+      fail(error.message);
+      console.log(error.message);
+      return;
     }
+
+    alert('Welcome back!');
   };
+
 
 
   return (
@@ -105,12 +119,12 @@ export default function LoginScreen({ onLogin, onOpenPrivacy, onOpenTerms }: Pro
             {/* Form */}
               <Animated.View style={{ gap: 20, transform: [{ translateX: shakeX }] }}>
                 <FatInput 
-                    label="Username"
-                    icon={User} 
+                    label="Email"
+                    icon={AtSign} 
                     value={username} 
                     onChangeText={setUsername}
                     autoCapitalize="none" 
-                    autoComplete="username" 
+                    autoComplete="email" 
                     returnKeyType="next"
                     onSubmitEditing={() => passwordRef.current?.focus()} 
                     size='small'
