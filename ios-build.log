@@ -1,0 +1,96 @@
+env: load .env
+env: export EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY EXPO_PUBLIC_SUPABASE_URL
+› Planning build
+› Executing react-native Pods/hermes-engine » [CP-User] [Hermes] Replace Hermes for the right configuration, if needed
+› Executing react-native Pods/ReactNativeDependencies » [CP-User] [RNDeps] Replace React Native Dependencies for the right configuration, if needed
+› Preparing Pods/React-cxxreact-React-cxxreact_privacy » ResourceBundle-React-cxxreact_privacy-React-cxxreact-Info.plist
+› Preparing Pods/React-timing-React-timing_privacy » ResourceBundle-React-timing_privacy-React-timing-Info.plist
+› Preparing Pods/React-Core-React-Core_privacy » ResourceBundle-React-Core_privacy-React-Core-Info.plist
+› Preparing Pods/RNSVG-RNSVGFilters » ResourceBundle-RNSVGFilters-RNSVG-Info.plist
+› Preparing Pods/ExpoSystemUI-ExpoSystemUI_privacy » ResourceBundle-ExpoSystemUI_privacy-ExpoSystemUI-Info.plist
+› Preparing Pods/ExpoDevice-ExpoDevice_privacy » ResourceBundle-ExpoDevice_privacy-ExpoDevice-Info.plist
+› Preparing Pods/EXConstants-ExpoConstants_privacy » ResourceBundle-ExpoConstants_privacy-EXConstants-Info.plist
+› Preparing Pods/ExpoFileSystem-ExpoFileSystem_privacy » ResourceBundle-ExpoFileSystem_privacy-ExpoFileSystem-Info.plist
+› Preparing expo-constants Pods/EXConstants-EXConstants » ResourceBundle-EXConstants-EXConstants-Info.plist
+› Preparing Pods/AsyncStorage-AsyncStorage_resources » ResourceBundle-AsyncStorage_resources-AsyncStorage-Info.plist
+› Executing react-native Pods/hermes-engine » [CP] Copy XCFrameworks
+› Executing react-native Pods/ReactNativeDependencies » [CP] Copy XCFrameworks
+› Executing react-native Pods/React-Core-prebuilt » [CP-User] [RNCore] Replace React Native Core for the right configuration, if needed
+› Executing expo-dev-menu-interface Pods/expo-dev-menu-interface » Copy generated compatibility header
+› Executing react-native Pods/React-Core-prebuilt » [CP] Copy XCFrameworks
+› Preparing Pods/expo-dev-menu-EXDevMenu » ResourceBundle-EXDevMenu-expo-dev-menu-Info.plist
+› Executing expo-modules-jsi Pods/ExpoModulesJSI » [CP-User] Build ExpoModulesJSI xcframework
+
+❌  Script '[CP-User] Build ExpoModulesJSI xcframework' failed
+   └─Pods/ExpoModulesJSI
+1 | #import "/Users/samyakchatterjee/Documents/congressional_app/sas/ios/Pods/Headers/Public/React-jsi/jsi/jsi.h"
+|         `- note: in file included from <module-includes>:1:
+2 | #import "/Users/samyakchatterjee/Documents/congressional_app/sas/ios/Pods/Headers/Public/React-jsi/jsi/instrumentation.h"
+3 |
+5 warnings generated.
+2265 |
+2266 | #include <jsi/jsi-inl.h>
+2267 |
+| `- warning: umbrella header for module 'jsi' does not include header 'jsilib.h'
+/Users/samyakchatterjee/Documents/congressional_app/sas/node_modules/expo-modules-jsi/apple/.DerivedData/Build/Products/Release-iphonesimulator/PackageFrameworks/ExpoModulesJSI.framework: resource fork, Finder information, or similar detritus not allowed
+
+
+❌  Command PhaseScriptExecution failed with a nonzero exit code
+** BUILD FAILED **
+
+› Executing react-native Pods/React-RCTFBReactNativeSpec » [CP-User] [RN]Check FBReactNativeSpec
+› Executing @expo/log-box Pods/ExpoLogBox » Copy generated compatibility header
+› Executing sas Pods/ReactCodegen » [CP-User] Generate Specs
+› Executing sas Pods/ReactCodegen » [Expo] Remove duplicate codegen output
+› Compiling react-native-svg Pods/RNSVG » RNSVGNode.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGMask.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGLinearGradient.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGMarkerManager.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGLinearGradientManager.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGMarker.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGMarkerPosition.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGLineManager.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGLine.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGLength.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGLayoutableShadowNode.cpp
+› Compiling react-native-svg Pods/RNSVG » RNSVGImageState.cpp
+› Compiling react-native-svg Pods/RNSVG » RNSVGImageShadowNode.cpp
+› Compiling react-native-svg Pods/RNSVG » RNSVGImageManager.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGImage.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGGroupManager.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGGroup.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGGlyphContext.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGForeignObjectManager.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGForeignObject.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGFontData.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGFilterRegion.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGFilterPrimitiveManager.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGFilterPrimitive.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGFilterManager.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGFilter.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGFeOffsetManager.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGFeOffset.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGFeMergeManager.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGFeMerge.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGFeGaussianBlurManager.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGFeGaussianBlur.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGFeFloodManager.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGFeFlood.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGFeCompositeManager.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGFeComposite.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGFeColorMatrixManager.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGFeColorMatrix.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGFeBlendManager.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGFeBlend.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGEllipseManager.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGEllipse.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGDefsManager.mm
+› Compiling react-native-svg Pods/RNSVG » RNSVGDefs.mm
+⚠️  Script has ambiguous dependencies causing it to run on every build.
+   To fix, go to: Xcode » sas/sas » Build Phases » '[Expo Dev Launcher] Strip Local Network Keys for Release'
+   Either: Uncheck "Based on dependency analysis", or select output files to trigger the script
+
+
+› 2 error(s), and 1 warning(s)
+
+CommandError: Failed to build iOS project. "xcodebuild" exited with error code 65.
