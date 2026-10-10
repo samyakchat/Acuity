@@ -2,11 +2,11 @@ import { ThemedText } from "@/components/themed-text";
 import { Spacing } from "@/constants/theme";
 import { useRef, useState } from "react";
 import { StyleSheet, View, Animated } from "react-native";
-import { FONT } from '@/components/fatUI/theme';
-import {useTheme} from "@/components/fatUI/theme";
+import { FONT } from "@/components/fatUI/theme";
+import { useTheme } from "@/components/fatUI/theme";
 import { WORDS } from "./word-list";
 import FatButton from "@/components/fatUI/fatButton";
-import { Eye, BadgePlus} from "lucide-react-native";
+import { Eye, BadgePlus } from "lucide-react-native";
 import { Image } from "expo-image";
 import { Text } from "react-native";
 import FatSheet from "@/components/fatUI/fatSheet";
@@ -106,7 +106,7 @@ export default function SeenIt() {
         toValue: 0.9,
         duration: 150,
         useNativeDriver: true,
-      })
+      }),
     ]).start(() => {
       nextWordCallback();
       Animated.parallel([
@@ -124,7 +124,7 @@ export default function SeenIt() {
           toValue: 1,
           duration: 150,
           useNativeDriver: true,
-        })
+        }),
       ]).start(() => {
         isAnimating.current = false;
       });
@@ -142,7 +142,7 @@ export default function SeenIt() {
     startedAt.current = Date.now();
     setCurrentWord(chooseWord());
     setHasStarted(true);
-    
+
     slideAnim.setValue(0);
     opacityAnim.setValue(1);
     scaleAnim.setValue(1);
@@ -191,17 +191,28 @@ export default function SeenIt() {
 
   if (!hasStarted) {
     return (
-      <View style={[styles.container, styles.instructionsContainer,
-        { backgroundColor: theme.primary, flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 20}]}>
-          <FatSheet
-            visible={open}
-            onDismiss={() => setOpen(false)}
-            title="How to play"
-            message="You will see a word on the screen. Your decide if you have seen this word before in the game or if it's new. If you have seen it, press 'Seen It'. If it's new, press 'New'."
-            buttonText="Got it"
-            buttonType="secondary"
-          />
-          
+      <View
+        style={[
+          styles.container,
+          styles.instructionsContainer,
+          {
+            backgroundColor: theme.primary,
+            flexDirection: "column",
+            justifyContent: "space-between",
+            alignItems: "center",
+            paddingVertical: 20,
+          },
+        ]}
+      >
+        <FatSheet
+          visible={open}
+          onDismiss={() => setOpen(false)}
+          title="How to play"
+          message="You will see a word on the screen. Your decide if you have seen this word before in the game or if it's new. If you have seen it, press 'Seen It'. If it's new, press 'New'."
+          buttonText="Got it"
+          buttonType="secondary"
+        />
+
         <View style={styles.titleGroup}>
           <Text style={[styles.subtitle, { color: theme.background }]}>
             Welcome to your daily game
@@ -210,9 +221,15 @@ export default function SeenIt() {
             Have I Seen It?
           </Text>
         </View>
-        <Image source={require('@/assets/mochi_stale/mochi_think.svg')} 
-              style={{ width: 210, height: 300, alignSelf: 'center', objectFit: 'contain' }} 
-          />
+        <Image
+          source={require("@/assets/mochi_stale/mochi_think.svg")}
+          style={{
+            width: 210,
+            height: 300,
+            alignSelf: "center",
+            objectFit: "contain",
+          }}
+        />
         <View style={styles.inlineButtonContainer}>
           <FatButton
             onPress={() => setOpen(true)}
@@ -228,22 +245,40 @@ export default function SeenIt() {
           />
         </View>
       </View>
-      );
-    }
+    );
+  }
 
   if (gameStats) {
     console.log("Game stats:", gameStats);
     return (
-      <View style={[styles.container, styles.resultsContainer, { backgroundColor: theme.primary }]}>
-        <Text style={[styles.title, styles.resultsTitle, { color: theme.background }]}>
+      <View
+        style={[
+          styles.container,
+          styles.resultsContainer,
+          { backgroundColor: theme.primary },
+        ]}
+      >
+        <Text
+          style={[
+            styles.title,
+            styles.resultsTitle,
+            { color: theme.background },
+          ]}
+        >
           Great Work!
         </Text>
         <Text style={[styles.subtitle, { color: theme.background }]}>
-            Let's move on to the next game!
-          </Text>
-        <Image source={require('@/assets/mochi_stale/mochi_celebrate.svg')} 
-              style={{ width: 210, height: 300, alignSelf: 'center', objectFit: 'contain' }} 
-          />
+          Let's move on to the next game!
+        </Text>
+        <Image
+          source={require("@/assets/mochi_stale/mochi_celebrate.svg")}
+          style={{
+            width: 210,
+            height: 300,
+            alignSelf: "center",
+            objectFit: "contain",
+          }}
+        />
       </View>
     );
   }
@@ -253,28 +288,27 @@ export default function SeenIt() {
   return (
     <View style={styles.container}>
       <FatSheet
-            visible={defOpen}
-            onDismiss={() => setDefOpen(false)}
-            title={currentWord}
-            message={getDefinition(currentWord)}
-            buttonText="Thanks!"
-            buttonType="secondary"
-          />
+        visible={defOpen}
+        onDismiss={() => setDefOpen(false)}
+        title={currentWord}
+        message={getDefinition(currentWord)}
+        buttonText="Thanks!"
+        buttonType="secondary"
+      />
 
       <View style={[styles.gameArea, { backgroundColor: theme.primary }]}>
         <Text style={[styles.subtitle, { color: theme.background }]}>
-            Your word is...
-          </Text>
-          
-        <Animated.View style={{ 
-          width: "100%", 
-          alignItems: "center",
-          opacity: opacityAnim,
-          transform: [
-            { translateY: slideAnim },
-            { scale: scaleAnim }
-          ]
-        }}>
+          Your word is...
+        </Text>
+
+        <Animated.View
+          style={{
+            width: "100%",
+            alignItems: "center",
+            opacity: opacityAnim,
+            transform: [{ translateY: slideAnim }, { scale: scaleAnim }],
+          }}
+        >
           <FatButton
             text={currentWord}
             type="primary"
@@ -283,24 +317,39 @@ export default function SeenIt() {
             onPress={() => onDefClicked()}
           />
         </Animated.View>
-        
       </View>
       <View style={{ width: "100%", gap: 32, paddingBottom: 32 }}>
         <View>
           <View style={styles.buttonRow}>
-              <View style={styles.buttonContainer}>
-                <FatButton onPress={onSeenClicked} text="Seen It" type="secondary" size="small" icon={Eye}/>
-                
-              </View>
+            <View style={styles.buttonContainer}>
+              <FatButton
+                onPress={onSeenClicked}
+                text="Seen It"
+                type="secondary"
+                size="small"
+                icon={Eye}
+              />
+            </View>
 
-              <View style={styles.buttonContainer}>
-                <FatButton onPress={onNewClicked} text="New" type="secondary" size="small" icon={BadgePlus}/>
-              </View>
+            <View style={styles.buttonContainer}>
+              <FatButton
+                onPress={onNewClicked}
+                text="New"
+                type="secondary"
+                size="small"
+                icon={BadgePlus}
+              />
             </View>
           </View>
-        <View style={[styles.progressTrack, {backgroundColor: theme.primaryEdge}]}>
+        </View>
+        <View
+          style={[styles.progressTrack, { backgroundColor: theme.primaryEdge }]}
+        >
           <View
-            style={[styles.progressFill, { width: progressWidth, backgroundColor: theme.background }]}
+            style={[
+              styles.progressFill,
+              { width: progressWidth, backgroundColor: theme.background },
+            ]}
           ></View>
         </View>
       </View>
@@ -398,12 +447,12 @@ const styles = StyleSheet.create({
     lineHeight: 28,
   },
   titleGroup: {
-    flexDirection: 'column',
-    justifyContent: 'center',
+    flexDirection: "column",
+    justifyContent: "center",
   },
   inlineButtonContainer: {
-    flexDirection: 'column',
-    width: '80%',
-    gap: 16, 
+    flexDirection: "column",
+    width: "80%",
+    gap: 16,
   },
 });
