@@ -10,6 +10,7 @@ import { useRouter } from 'expo-router';
 import { LogOut } from 'lucide-react-native';
 import FatButton from '@/components/fatUI/fatButton';
 import { supabase } from '@/lib/supabase';
+import { pairingCode } from '@/lib/paircode';
 
 export default function HomeScreen() {
   const theme = useTheme();
@@ -32,6 +33,10 @@ export default function HomeScreen() {
               params: {gameID: "seenIt-10987", primaryColor: theme.primary} 
             })} 
           />
+
+        <Button title="pairingtest" onPress={() => 
+          router.push('./pairing/pairingPage')} 
+        />
 
         <FatButton
           text="Log out"
