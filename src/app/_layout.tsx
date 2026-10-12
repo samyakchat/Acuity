@@ -50,6 +50,9 @@ function RootNavigator() {
       <Stack.Protected guard={role==="patient"}>
         <Stack.Screen name="(patient)" />
       </Stack.Protected>
+      <Stack.Protected guard={role==="caretaker"}>
+        <Stack.Screen name="(caretaker)" />
+      </Stack.Protected>
     </Stack>
   );    
 }
