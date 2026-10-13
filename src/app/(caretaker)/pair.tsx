@@ -20,10 +20,7 @@ import { supabase } from '@/lib/supabase';
 
 type Patient = { id: string; name: string; addedAt: string };
 
-const POLL_MS = 30000;
-
 const normalizeCode = (text: string) => text.toUpperCase().replace(/[^A-Z0-9]/g, '');
-
 const openPatient = (patientId: string) => {};
 
 function PatientRow({ patient, index }: { patient: Patient; index: number }) {
@@ -166,7 +163,7 @@ export default function PairingPage() {
   useEffect(() => {
     let timer: ReturnType<typeof setInterval> | null = null;
     const start = () => {
-      if (!timer) timer = setInterval(loadPatients, POLL_MS);
+      if (!timer) timer = setInterval(loadPatients, 30000);
     };
     const stop = () => {
       if (timer) clearInterval(timer);
