@@ -148,6 +148,7 @@ export default function PairingPage() {
       }
 
       if (id !== requestId.current) return; 
+      setPatients(next);
       setListError(null);
 
     } catch (e: any) {
