@@ -26,7 +26,7 @@ const SIZES = {
 const STACKED_EXTRA = 24;
 
 export type FatButtonProps = {
-  text: string;
+  text?: string;
   onPress: () => void;
   icon?: LucideIcon;
   iconPosition?: 'left' | 'right' | 'top';

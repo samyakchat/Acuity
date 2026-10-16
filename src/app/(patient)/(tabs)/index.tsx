@@ -26,17 +26,23 @@ export default function HomeScreen() {
         </ThemedView>
 
         
-
         <Button title="seen it game finished" onPress={() => 
             router.push({
               pathname: '/(patient)/gamePages/gametemp', 
               params: {gameID: "seenIt-10987", primaryColor: theme.primary} 
             })} 
           />
+        <Button title="word garden ip" onPress={() => 
+            router.push({
+              pathname: '/(patient)/gamePages/gametemp', 
+              params: {gameID: "wordGarden-11987", primaryColor: '#2db35d'} 
+            })} 
+          />
 
         <Button title="pairingtest" onPress={() => 
           router.push('./pairing/pairingPage')} 
         />
+
 
         <FatButton
           text="Log out"

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   AccessibilityInfo,
+  Alert,
   Animated,
   Easing,
   KeyboardAvoidingView,
@@ -97,8 +98,11 @@ export default function LoginScreen({ onLogin}: Props) {
         return;
     }
 
-    alert("Thank you for joining Acuity!");
-  };
+    Alert.alert(
+          'Welcome, thank you for joining!', 
+          'To start, lets get to know you'
+      );
+    };
 
 
   return (

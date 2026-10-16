@@ -5,10 +5,12 @@ import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
 import FatHeader from "@/components/fatUI/fatHeader";
 import { useTheme } from "@/components/fatUI/theme";
 import { View } from "react-native";
+import WordGarden from "@/components/games/WordGardenGame/wordGarden";
 import { useLocalSearchParams } from "expo-router";
 
 export const registry = {
   "seenIt-10987": SeenIt,
+  "wordGarden-11987": WordGarden,
 }
 
 export default function GameLoader() {
