@@ -1,6 +1,7 @@
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import SeenIt from "@/components/games/SeenItGame/seenIt";
+import PatternFactory from "@/components/games/PatternFactory/patternFactory";
 import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
 import FatHeader from "@/components/fatUI/fatHeader";
 import { useTheme } from "@/components/fatUI/theme";
@@ -9,6 +10,7 @@ import { useLocalSearchParams } from "expo-router";
 
 export const registry = {
   "seenIt-10987": SeenIt,
+  "patternFactory-10990": PatternFactory,
 }
 
 export default function GameLoader() {
@@ -19,7 +21,7 @@ export default function GameLoader() {
     <View style={[styles.container, {backgroundColor: primaryColor as string}]}>
       <SafeAreaView style={styles.safeArea}>
         <FatHeader backgroundColor={primaryColor as string}/>
-        <View style={[styles.heroSection, {backgroundColor: primaryColor as string}]}> 
+        <View style={[styles.heroSection, {backgroundColor: primaryColor as string}]}>
           <RunningGame />
         </View>
       </SafeAreaView>
