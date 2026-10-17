@@ -25,17 +25,25 @@ export default function HomeScreen() {
           </ThemedText>
         </ThemedView>
 
-        
 
-        <Button title="seen it game finished" onPress={() => 
+
+        <Button title="seen it game finished" onPress={() =>
             router.push({
-              pathname: '/(patient)/gamePages/gametemp', 
-              params: {gameID: "seenIt-10987", primaryColor: theme.primary} 
-            })} 
+              pathname: '/(patient)/gamePages/gametemp',
+              params: {gameID: "seenIt-10987", primaryColor: theme.primary}
+            })}
           />
 
-        <Button title="pairingtest" onPress={() => 
-          router.push('./pairing/pairingPage')} 
+        <Button
+          title="Pattern Factory Test"
+          onPress={() => router.push({
+            pathname: '/(patient)/gamePages/gametemp',
+            params: {gameID: "patternFactory-10990", primaryColor: theme.primary}
+          })}
+        />
+
+        <Button title="pairingtest" onPress={() =>
+          router.push('./pairing/pairingPage')}
         />
 
         <FatButton
