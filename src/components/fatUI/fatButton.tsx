@@ -26,7 +26,7 @@ const SIZES = {
 const STACKED_EXTRA = 24;
 
 export type FatButtonProps = {
-  text: string;
+  text?: string;
   onPress: () => void;
   icon?: LucideIcon;
   iconPosition?: 'left' | 'right' | 'top';
@@ -43,6 +43,13 @@ export type FatButtonProps = {
   fontSize?: number;
   iconSize?: number;
   height?: number;
+
+  // all optional, defaults keep existing behavior
+  iconFill?: string; // fills the icon shape (stroke still uses textColor)
+  iconOnly?: boolean; // don't render the label Text at all (no stray gap)
+  edgeDepth?: number; // overrides the size preset's bottom edge thickness
+  radius?: number; // overrides the size preset's corner radius
+  inert?: boolean; // display-only: no press animation, not announced as a button
 
   style?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
@@ -65,6 +72,11 @@ export default function FatButton({
   fontSize,
   iconSize,
   height,
+  iconFill,
+  iconOnly,
+  edgeDepth,
+  radius,
+  inert,
   style,
   textStyle,
   accessibilityLabel,
@@ -76,6 +88,9 @@ export default function FatButton({
   const isPrimary = type === 'primary';
   const stacked = iconPosition === 'top' && !!Icon;
 
+  const edgeSize = edgeDepth ?? s.edge;
+  const cornerRadius = radius ?? s.radius;
+
   const face = color ?? (isPrimary ? theme.primary : theme.secondaryFace);
   const edge =
     edgeColor ??
@@ -83,7 +98,7 @@ export default function FatButton({
   const fg = textColor ?? (isPrimary ? theme.onPrimary : theme.text);
 
   const faceHeight = height ?? s.height + (stacked ? STACKED_EXTRA : 0);
-  const blocked = !!disabled || !!loading;
+  const blocked = !!disabled || !!loading || !!inert;
 
   const press = (to: number, bounciness: number) =>
     Animated.spring(y, {
@@ -100,18 +115,18 @@ export default function FatButton({
     <Pressable
       onPress={onPress}
       disabled={blocked}
-      onPressIn={() => press(s.edge, 0)}
-      onPressOut={() => press(0, 8)}
-      accessibilityRole="button"
+      onPressIn={inert ? undefined : () => press(edgeSize, 0)}
+      onPressOut={inert ? undefined : () => press(0, 8)}
+      accessibilityRole={inert ? 'image' : 'button'}
       accessibilityLabel={accessibilityLabel ?? label}
-      accessibilityState={{ disabled: !!disabled, busy: !!loading }}
+      accessibilityState={inert ? undefined : { disabled: !!disabled, busy: !!loading }}
       style={style}
     >
-      <View style={{ height: faceHeight + s.edge }}>
+      <View style={{ height: faceHeight + edgeSize }}>
         <View
           style={[
             styles.edge,
-            { height: faceHeight, backgroundColor: edge, borderRadius: s.radius },
+            { height: faceHeight, backgroundColor: edge, borderRadius: cornerRadius },
           ]}
         />
         <Animated.View
@@ -121,7 +136,7 @@ export default function FatButton({
               height: faceHeight,
               backgroundColor: face,
               borderColor: edge,
-              borderRadius: s.radius,
+              borderRadius: cornerRadius,
               gap: s.gap,
               flexDirection: stacked
                 ? 'column'
@@ -136,23 +151,30 @@ export default function FatButton({
           {loading ? (
             <ActivityIndicator color={fg} />
           ) : Icon ? (
-            <Icon size={iconSize ?? s.icon} color={fg} strokeWidth={2.75} />
+            <Icon
+              size={iconSize ?? s.icon}
+              color={fg}
+              strokeWidth={2.75}
+              {...(iconFill ? { fill: iconFill } : null)}
+            />
           ) : null}
-          <Text
-            style={[
-              {
-                fontFamily: FONT.heavy,
-                fontSize: textSize,
-                lineHeight: Math.round(textSize * 1.2),
-                color: fg,
-                textAlign: 'center',
-                flexShrink: 1,
-              },
-              textStyle,
-            ]}
-          >
-            {label}
-          </Text>
+          {iconOnly ? null : (
+            <Text
+              style={[
+                {
+                  fontFamily: FONT.heavy,
+                  fontSize: textSize,
+                  lineHeight: Math.round(textSize * 1.2),
+                  color: fg,
+                  textAlign: 'center',
+                  flexShrink: 1,
+                },
+                textStyle,
+              ]}
+            >
+              {label}
+            </Text>
+          )}
         </Animated.View>
       </View>
     </Pressable>

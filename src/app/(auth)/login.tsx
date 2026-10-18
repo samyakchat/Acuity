@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   AccessibilityInfo,
+  Alert,
   Animated,
   Easing,
   KeyboardAvoidingView,
@@ -86,7 +87,10 @@ export default function LoginScreen({ onLogin, onOpenPrivacy, onOpenTerms }: Pro
       return;
     }
 
-    alert('Welcome back!');
+    Alert.alert(
+      'Welcome Back!', 
+      'Say hi to Mochi!'
+    );
   };
 
 
