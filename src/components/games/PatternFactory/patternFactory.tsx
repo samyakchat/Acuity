@@ -18,7 +18,7 @@ import Block, { availableShapes, type Shape } from "./block";
 
 type PatternAnswer = "same" | "different";
 
-const TOTAL_ROUNDS = 11;
+const TOTAL_ROUNDS = 7;
 const PATTERN_LENGTH = 4;
 
 // Animation timing
