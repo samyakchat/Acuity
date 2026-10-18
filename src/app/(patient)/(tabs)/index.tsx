@@ -32,10 +32,16 @@ export default function HomeScreen() {
               params: {gameID: "seenIt-10987", primaryColor: theme.primary} 
             })} 
           />
-        <Button title="word garden ip" onPress={() => 
+        <Button title="word garden finished" onPress={() => 
             router.push({
               pathname: '/(patient)/gamePages/gametemp', 
               params: {gameID: "wordGarden-11987", primaryColor: '#2db35d'} 
+            })} 
+          />
+        <Button title="digmeout ip" onPress={() => 
+            router.push({
+              pathname: '/(patient)/gamePages/gametemp', 
+              params: {gameID: "digMeOut-12546", primaryColor: '#EFBF04'} 
             })} 
           />
 

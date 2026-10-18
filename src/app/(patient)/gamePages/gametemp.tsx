@@ -6,11 +6,15 @@ import FatHeader from "@/components/fatUI/fatHeader";
 import { useTheme } from "@/components/fatUI/theme";
 import { View } from "react-native";
 import WordGarden from "@/components/games/WordGardenGame/wordGarden";
+import DigMeOut from "@/components/games/DigMeOut/digmeout"
 import { useLocalSearchParams } from "expo-router";
+import { useEffect } from "react";
 
 export const registry = {
   "seenIt-10987": SeenIt,
   "wordGarden-11987": WordGarden,
+  "digMeOut-12546": DigMeOut
+
 }
 
 export default function GameLoader() {

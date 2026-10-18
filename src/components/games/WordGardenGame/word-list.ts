@@ -661,39 +661,6 @@ export const CATEGORIES: Category[] = [
     },
   },
   {
-    id: "health",
-    title: "HEALTH AND WELLNESS WORDS",
-    clusters: {
-      "everyday health items": [
-        "thermometer", "bandage", "band-aid", "ice pack", "heating pad",
-        "hot water bottle", "first aid kit", "cotton swab", "gauze",
-        "adhesive tape", "antiseptic", "tweezers", "pill organizer",
-        "medicine bottle", "eyeglasses", "reading glasses", "hearing aid",
-        "cane", "walker", "magnifying glass", "dentures", "contact lenses",
-      ],
-      "medical professionals": [
-        "doctor", "nurse", "dentist", "eye doctor", "optometrist",
-        "pharmacist", "physical therapist", "surgeon", "pediatrician",
-        "cardiologist", "receptionist", "paramedic", "caregiver",
-        "home health aide", "dietitian", "audiologist", "orthopedist",
-        "veterinarian", "medical assistant", "lab technician",
-      ],
-      "healthy routines": [
-        "walking", "stretching", "drinking water", "eating breakfast",
-        "brushing teeth", "washing hands", "taking a walk", "gardening",
-        "swimming", "dancing", "deep breathing", "resting", "napping",
-        "reading", "socializing", "cooking", "light exercise",
-        "morning routine", "bedtime routine", "fresh air",
-      ],
-      "body and senses": [
-        "eyes", "ears", "nose", "mouth", "hands", "fingers", "feet",
-        "toes", "knees", "elbows", "shoulders", "back", "heart",
-        "lungs", "brain", "skin", "teeth", "tongue", "wrist", "ankle",
-        "hearing", "vision", "smell", "taste", "touch",
-      ],
-    },
-  },
-  {
     id: "books",
     title: "BOOKS AND LEARNING WORDS",
     clusters: {
