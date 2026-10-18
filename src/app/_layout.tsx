@@ -47,10 +47,10 @@ function RootNavigator() {
       <Stack.Protected guard={!role}>
         <Stack.Screen name="(auth)" />
       </Stack.Protected>
-      <Stack.Protected guard={role==="patient"}>
+      <Stack.Protected guard={role==="patient"} redirectTo={"/(auth)/intro"}>
         <Stack.Screen name="(patient)" />
       </Stack.Protected>
-      <Stack.Protected guard={role==="caretaker"}>
+      <Stack.Protected guard={role==="caretaker"} redirectTo={"/(auth)/intro"}>
         <Stack.Screen name="(caretaker)" />
       </Stack.Protected>
     </Stack>

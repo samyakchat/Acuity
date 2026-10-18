@@ -714,7 +714,7 @@ export default function WordGarden() {
       {sheets}
       <View style={[styles.gameArea, { backgroundColor: theme.primary }]}>
         <View style={{marginBottom: 10}}>
-          <Text style={[styles.title, { color: theme.background }]}>{category.title}</Text>
+          <Text style={[styles.title, { color: theme.background, fontSize: 30 }]}>{category.title}</Text>
           <Text style={[styles.bigNumber, { color: theme.background }]}>{secondsLeft}</Text>
         </View>
         <GardenUI planted={planted} onPlantPress={onPlantPress}/>
@@ -725,7 +725,7 @@ export default function WordGarden() {
         )}
       </View>
 
-      <View style={{ width: "100%", gap: 16, paddingBottom: 32 }}>
+      <View style={{ width: "100%", gap: 16, paddingBottom:0 }}>
         {DEBUG_TEXT_INPUT && (
           <TextInput
             value={typed}
@@ -791,8 +791,8 @@ const styles = StyleSheet.create({
   bigNumber: {
     textAlign: "center",
     fontFamily: FONT.title,
-    fontSize: 70,
-    lineHeight: 100,
+    fontSize: 50,
+    lineHeight: 70,
   },
   titleGroup: {
     flexDirection: "column",
