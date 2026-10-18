@@ -7,13 +7,15 @@ import { useTheme } from "@/components/fatUI/theme";
 import { View } from "react-native";
 import WordGarden from "@/components/games/WordGardenGame/wordGarden";
 import DigMeOut from "@/components/games/DigMeOut/digmeout"
+import PatternFactory from "@/components/games/PatternFactory/patternFactory";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect } from "react";
 
 export const registry = {
   "seenIt-10987": SeenIt,
   "wordGarden-11987": WordGarden,
-  "digMeOut-12546": DigMeOut
+  "digMeOut-12546": DigMeOut,
+  "patternFactory-13476": PatternFactory
 
 }
 

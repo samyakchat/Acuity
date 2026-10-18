@@ -1,35 +1,59 @@
-import { StyleSheet, View } from "react-native";
-import { Image, type ImageSource } from "expo-image";
+import React from "react";
+import Svg, { Ellipse } from "react-native-svg";
+import {
+  Circle,
+  Hexagon,
+  Octagon,
+  RectangleHorizontal,
+  Square,
+  Triangle,
+  type LucideIcon,
+} from "lucide-react-native";
+import FatButton from "@/components/fatUI/fatButton";
 
-const shapeSources = {
-  circle: require("@/assets/game_assets/Circle.png"),
-  square: require("@/assets/game_assets/Square.png"),
-  triangle: require("@/assets/game_assets/Triangle.png"),
-  rectangle: require("@/assets/game_assets/Rectangle.png"),
-  oval: require("@/assets/game_assets/Oval.png"),
-  hexagon: require("@/assets/game_assets/Hexagon.png"),
-  octagon: require("@/assets/game_assets/Octagon.png"),
-} satisfies Record<string, ImageSource | number>;
+const Oval = (({ size = 24, color = "#000", fill = "none", strokeWidth = 2 }: any) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Ellipse
+      cx={12}
+      cy={12}
+      rx={10}
+      ry={6.5}
+      stroke={color}
+      fill={fill}
+      strokeWidth={strokeWidth}
+      strokeLinejoin="round"
+    />
+  </Svg>
+)) as unknown as LucideIcon;
 
-export type Shape = keyof typeof shapeSources;
-export const availableShapes: readonly Shape[] = Object.keys(shapeSources) as Shape[];
-
-type ShapeLayout = {
-  imageSize: number;
-  centerY: number;
+type ShapeStyle = {
+  icon: LucideIcon;
+  color: string;
+  scale: number; 
 };
 
-// Image sizes are measured against the original 541px-wide block asset.
-// centerY accounts for shapes drawn off-center within their transparent canvas.
-const shapeLayouts: Record<Shape, ShapeLayout> = {
-  circle: { imageSize: 470, centerY: 0.5 },
-  square: { imageSize: 465, centerY: 0.5 },
-  triangle: { imageSize: 520, centerY: 0.5 },
-  rectangle: { imageSize: 285, centerY: 0.51925 },
-  oval: { imageSize: 308, centerY: 0.51325 },
-  hexagon: { imageSize: 515, centerY: 0.5 },
-  octagon: { imageSize: 480, centerY: 0.5 },
-};
+// Muted tones so each one sits on the tan wood without glowing or washing out.
+const shapeStyles = {
+  circle: { icon: Circle, color: "#8B5FBF", scale: 0.62 }, // purple
+  hexagon: { icon: Hexagon, color: "#E0B13A", scale: 0.64 }, // yellow
+  oval: { icon: Oval, color: "#DE8636", scale: 0.68 }, // orange
+  octagon: { icon: Octagon, color: "#D5648F", scale: 0.62 }, // pink
+  rectangle: { icon: RectangleHorizontal, color: "#5BA85A", scale: 0.68 }, // green
+  square: { icon: Square, color: "#C94A47", scale: 0.56 }, // red
+  triangle: { icon: Triangle, color: "#4A82D1", scale: 0.64 }, // blue
+} satisfies Record<string, ShapeStyle>;
+
+export type Shape = keyof typeof shapeStyles;
+export const availableShapes: readonly Shape[] = Object.keys(shapeStyles) as Shape[];
+
+// Wood block colors (pale tan face, deeper brown edge)
+const WOOD_FACE = "#DDBB8A";
+const WOOD_EDGE = "#B58E5B";
+
+// Matches the "medium" FatButton preset edge, which Block uses by default.
+const BLOCK_EDGE = 5;
+
+const noop = () => {};
 
 export type BlockProps = {
   width: number;
@@ -42,46 +66,27 @@ export default function Block({
   shape,
   accessibilityLabel = "Wood block",
 }: BlockProps) {
-  const layout: ShapeLayout = shapeLayouts[shape];
-  const imageSize: number = width * (layout.imageSize / 541);
+  const { icon, color, scale } = shapeStyles[shape];
+
+  // Every block is a square: width x width, bottom edge included.
+  const faceHeight = width - BLOCK_EDGE;
 
   return (
-    <View
-      style={[styles.block, { width }]}
-      accessible
+    <FatButton
+      inert
+      iconOnly
+      size="medium"
+      onPress={noop}
+      icon={icon}
+      iconFill={color}
+      textColor={color}
+      iconSize={faceHeight * scale}
+      color={WOOD_FACE}
+      edgeColor={WOOD_EDGE}
+      height={faceHeight}
+      radius={Math.round(width * 0.14)}
+      style={{ width, flexShrink: 0 }}
       accessibilityLabel={`${accessibilityLabel}, ${shape} on front face`}
-    >
-      <Image
-        source={require("@/assets/game_assets/PatternFactory_WoodBlock.png")}
-        style={StyleSheet.absoluteFill}
-        contentFit="contain"
-        accessible={false}
-      />
-      <Image
-        source={shapeSources[shape]}
-        style={[
-          styles.shape,
-          {
-            width: imageSize,
-            height: imageSize,
-            left: width * (250 / 541) - imageSize / 2,
-            top: width * (191 / 541) - imageSize * layout.centerY,
-          },
-        ]}
-        contentFit="contain"
-        accessible={false}
-        pointerEvents="none"
-      />
-    </View>
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  block: {
-    flexShrink: 0,
-    aspectRatio: 541 / 360,
-  },
-  shape: {
-    position: "absolute",
-  },
-});

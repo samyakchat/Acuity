@@ -44,6 +44,13 @@ export default function HomeScreen() {
               params: {gameID: "digMeOut-12546", primaryColor: '#EFBF04'} 
             })} 
           />
+        <Button title="pattern factory" onPress={() => 
+            router.push({
+              pathname: '/(patient)/gamePages/gametemp', 
+              params: {gameID: "patternFactory-13476", primaryColor: theme.primary} 
+            })} 
+          />
+
 
         <Button title="pairingtest" onPress={() => 
           router.push('./pairing/pairingPage')} 
