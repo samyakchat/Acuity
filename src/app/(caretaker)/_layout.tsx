@@ -1,7 +1,10 @@
-
-import AppTabsCare from '@/components/app-tabs-care';
 import { Stack } from 'expo-router';
 
-export default function CaretakerTabs() {
-  return <AppTabsCare/>;
+export default function CaretakerLayout() {
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="pages" />
+    </Stack>
+  );
 }

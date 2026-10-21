@@ -12,6 +12,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter, useSegments } from 'expo-router';
 import { ChevronRight, CircleAlert, CircleUser, KeyRound, UserPlus, Users } from 'lucide-react-native';
 import FatButton from '@/components/fatUI/fatButton';
 import FatInput from '@/components/fatUI/fatInput';
@@ -21,10 +22,12 @@ import { supabase } from '@/lib/supabase';
 type Patient = { id: string; name: string; addedAt: string };
 
 const normalizeCode = (text: string) => text.toUpperCase().replace(/[^A-Z0-9]/g, '');
-const openPatient = (patientId: string) => {};
+
 
 function PatientRow({ patient, index }: { patient: Patient; index: number }) {
   const theme = useTheme();
+  const router = useRouter();
+  const openPatient = (patientId: string) => router.push({ pathname: '/pages/[id]', params: { id: patientId } });;
   const enter = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -72,6 +75,8 @@ function PatientRow({ patient, index }: { patient: Patient; index: number }) {
 
 export default function PairingPage() {
   const theme = useTheme();
+  const segments = useSegments();
+console.log('SEGMENTS', segments);
 
   const [open, setOpen] = useState(false);
   const [code, setCode] = useState('');
