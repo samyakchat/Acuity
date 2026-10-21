@@ -53,7 +53,7 @@ export default function HomeScreen() {
 
 
         <Button title="pairingtest" onPress={() => 
-          router.push('./pairing/pairingPage')} 
+          router.push('/(patient)/tests/start')} 
         />
 
 

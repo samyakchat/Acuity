@@ -16,6 +16,7 @@ import {
   isOpenCell,
 } from "@/components/games/DigMeOut/levelgen";
 import { Dimensions } from "react-native";
+import { routerObj } from "@/app/(patient)/tests/engine";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 const isCompact = SCREEN_HEIGHT < 700;
@@ -63,7 +64,7 @@ function Art({ name, Icon, size, color }: { name: string; Icon: any; size: numbe
   return <Icon size={size * 0.7} color={color} />;
 }
 
-export default function DigMeOut({ onComplete }: { onComplete?: (report: object) => void }) {
+export default function DigMeOut({ onComplete }: { onComplete?: (result?: Record<string, unknown>) => void }) {
   const [maze] = useState(() => buildMaze(generateLevel()));
   const { level, rows, cols, start, home, dist, ideal } = maze;
 
@@ -209,14 +210,6 @@ export default function DigMeOut({ onComplete }: { onComplete?: (report: object)
     })
   ).current;
 
-  function onRestart() {
-    if (finished.current) return;
-    restarts.current += 1;
-    log("restart", start);
-    pathRef.current = [start];
-    lastHit.current = "";
-    setPath([start]);
-  }
 
   function finish() {
     finished.current = true;
@@ -236,33 +229,33 @@ export default function DigMeOut({ onComplete }: { onComplete?: (report: object)
       .map((e) => ({ atCell: e.from, ms: e.gapMs, exits: openNeighbors(e.from), thenDid: e.type }));
     const finalLength = taken.length - 1;
     const idealLength = ideal.length - 1;
+    
     return {
-      level, // the exact maze this person played
+    //   level,
       totalMs: Date.now() - startedAt.current,
-      timeToFirstMoveMs: trail.length ? trail[0].tMs : null, // planning time before acting
+      timeToFirstMoveMs: trail.length ? trail[0].tMs : null,
       howToPlayOpenedCount: howOpened.current,
 
-      pathTaken: taken, // final tunnel, start to home
-      idealPath: ideal, // computer's shortest route
+    //   pathTaken: taken,
+    //   idealPath: ideal,
       idealLength,
       finalLength,
       extraSteps: finalLength - idealLength,
       efficiency: round2(idealLength / finalLength),
 
       totalDigs: digs.length,
-      stepsAwayFromHome: digs.filter((e) => e.toward === false).length, // detour steps
+      stepsAwayFromHome: digs.filter((e) => e.toward === false).length, 
       backtracks: trail.filter((e) => e.type === "back").length,
       rockHits: trail.filter((e) => e.type === "hitRock").length,
       waterHits: trail.filter((e) => e.type === "hitWater").length,
-      restarts: restarts.current,
+    //   restarts: restarts.current,
 
-      pauses, // every stop to think, with where it happened
-      pausesAtJunctions: pauses.filter((p) => p.exits >= 3).length, // decision points
-      trail, // full move-by-move log, including mistakes
+      pauses: pauses.length, 
+      pausesAtJunctions: pauses.filter((p) => p.exits >= 3).length,
+    //   trail, 
     };
   }
 
-  /* ---------- intro ---------- */
   if (!started) {
     return (
       <View
@@ -284,7 +277,7 @@ export default function DigMeOut({ onComplete }: { onComplete?: (report: object)
           <Text style={[styles.subtitle, { color: theme.background }]}>Welcome to your daily theme</Text>
           <Text style={[styles.title, { color: theme.background }]}>Dig Me Out!</Text>
         </View>
-        <Image source={require("@/assets/mochi_stale/mochi_think.svg")} style={styles.mochi} />
+        <Image source={require("@/assets/mochi_stale/mochi_shovel.svg")} style={styles.mochi} />
         <View style={styles.inlineButtonContainer}>
           <FatButton
             onPress={() => {
@@ -301,7 +294,6 @@ export default function DigMeOut({ onComplete }: { onComplete?: (report: object)
     );
   }
 
-  /* ---------- results ---------- */
   if (done) {
     return (
       <View style={[styles.container, styles.centered, { backgroundColor: theme.primary }]}>
@@ -312,7 +304,6 @@ export default function DigMeOut({ onComplete }: { onComplete?: (report: object)
     );
   }
 
-  /* ---------- theme ---------- */
   const dug = new Set(path.map(([r, c]) => `${r},${c}`));
 
   return (

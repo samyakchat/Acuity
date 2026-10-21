@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import type { LucideIcon } from 'lucide-react-native';
 import { FONT, darken, useTheme } from '@/components/fatUI/theme';
-
+import * as Haptics from 'expo-haptics';
 export type FatButtonType = 'primary' | 'secondary';
 export type FatButtonSize = 'small' | 'medium' | 'large';
 
@@ -115,7 +115,7 @@ export default function FatButton({
     <Pressable
       onPress={onPress}
       disabled={blocked}
-      onPressIn={inert ? undefined : () => press(edgeSize, 0)}
+      onPressIn={inert ? undefined : () => {press(edgeSize, 0); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);}}
       onPressOut={inert ? undefined : () => press(0, 8)}
       accessibilityRole={inert ? 'image' : 'button'}
       accessibilityLabel={accessibilityLabel ?? label}

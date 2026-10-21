@@ -6,29 +6,102 @@ import FatHeader from "@/components/fatUI/fatHeader";
 import { useTheme } from "@/components/fatUI/theme";
 import { View } from "react-native";
 import WordGarden from "@/components/games/WordGardenGame/wordGarden";
-import DigMeOut from "@/components/games/DigMeOut/digmeout"
+import DigMeOut from "@/components/games/DigMeOut/digmeout";
 import PatternFactory from "@/components/games/PatternFactory/patternFactory";
-import { useLocalSearchParams } from "expo-router";
-import { useEffect } from "react";
+import { router, useLocalSearchParams } from "expo-router";
+import { ChevronRight } from "lucide-react-native";
+import { aptitudeList, recordResult, startSession, submitSession } from "../tests/engine";
+import { useState, useEffect } from "react";
+import Intro from "@/components/activities/DelayedRecall/delayed";
+import { Ending } from "@/components/activities/DelayedRecall/delayed";
+import { Welcome, GameSection, ThankYou } from "@/components/activities/static";
+import SpeakUp from "@/components/activities/Orientation/speakup";
+import TaskOrder from "@/components/activities/BasicFunc/taskord";
+
 
 export const registry = {
   "seenIt-10987": SeenIt,
   "wordGarden-11987": WordGarden,
   "digMeOut-12546": DigMeOut,
-  "patternFactory-13476": PatternFactory
+  "patternFactory-13476": PatternFactory,
+  "intro-1": Intro,
+  "ending-1": Ending,
+  'welcome': Welcome,
+  'gamesection_m': GameSection,
+  'thanks': ThankYou,
+  "orient-1": SpeakUp,
+  'basicfunc-1':TaskOrder
 
-}
+};
 
 export default function GameLoader() {
   const theme = useTheme();
-  const { gameID, primaryColor} = useLocalSearchParams();
+
+
+  
+  const color_registry: Record<string, string> = {
+    "seenIt-10987": theme.primary,
+    "wordGarden-11987": "#2db35d",
+    "digMeOut-12546": "#EFBF04",
+    "patternFactory-13476": theme.primary,
+    "intro-1":theme.background,
+    "ending-1":theme.background,
+    "welcome":theme.background,
+    "gamesection_m":theme.background,
+    "thanks":theme.background,
+    "orient-1":theme.background,
+    'basicfunc-1':theme.background
+  };
+
+  const { gameID = aptitudeList[0] } = useLocalSearchParams<{ gameID?: string }>();
+  const [isComplete, setIsComplete] = useState(false);
+
+  useEffect(() => {
+    setIsComplete(false);
+  }, [gameID]);
+
+  useEffect(() => { if (gameID === aptitudeList[0]) startSession(); }, []);
+
+
   const RunningGame = registry[gameID as keyof typeof registry];
+  const primaryColor = color_registry[gameID] || theme.primary;
+
+  const handleGameComplete = (result?: Record<string, unknown>) => {
+    recordResult(gameID, result);
+    setIsComplete(true);
+  };
+
+  const handleNextStep = async() => {
+    const currentIndex = aptitudeList.indexOf(gameID);
+    const nextIndex = currentIndex + 1;
+
+    if (nextIndex < aptitudeList.length) {
+      const nextGameID = aptitudeList[nextIndex];
+      router.setParams({ gameID: nextGameID });
+    } else {
+      await submitSession();
+      router.replace("/testResults" as any);
+    }
+  };
+
+  if (!RunningGame) return null;
+
   return (
-    <View style={[styles.container, {backgroundColor: primaryColor as string}]}>
+    <View style={[styles.container, { backgroundColor: primaryColor }]}>
       <SafeAreaView style={styles.safeArea}>
-        <FatHeader backgroundColor={primaryColor as string}/>
-        <View style={[styles.heroSection, {backgroundColor: primaryColor as string}]}> 
-          <RunningGame />
+        {isComplete ? (
+          <FatHeader 
+            backgroundColor={primaryColor} 
+            rightButtonIcon={ChevronRight} 
+            rightButtonText="Next" 
+            rightButtonOnPress={handleNextStep}
+            rightButtonType="primary"
+          />
+        ) : (
+          <FatHeader backgroundColor={primaryColor} />
+        )}
+        <View style={[styles.heroSection, { backgroundColor: primaryColor }]}> 
+          <RunningGame onComplete={handleGameComplete} />
         </View>
       </SafeAreaView>
     </View>
@@ -52,20 +125,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     flex: 1,
     alignSelf: "stretch",
-  },
-  title: {
-    textAlign: "center",
-    paddingHorizontal: Spacing.four,
-  },
-  code: {
-    textTransform: "uppercase",
-    marginHorizontal: Spacing.four,
-  },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: "stretch",
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
   },
 });

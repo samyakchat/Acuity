@@ -15,6 +15,7 @@ import FatSheet from "@/components/fatUI/fatSheet";
 import { FONT, useTheme } from "@/components/fatUI/theme";
 import { Spacing } from "@/constants/theme";
 import Block, { availableShapes, type Shape } from "./block";
+import { routerObj } from "@/app/(patient)/tests/engine";
 
 type PatternAnswer = "same" | "different";
 
@@ -187,7 +188,7 @@ function CountdownNumber({ value, style }: { value: number; style: StyleProp<Tex
   );
 }
 
-export default function PatternFactory() {
+export default function PatternFactory({ onComplete }: { onComplete?: (result?: Record<string, unknown>) => void }) {
   const theme = useTheme();
   const [pattern, setPattern] = useState<Shape[]>(createPattern);
   const [secondPattern, setSecondPattern] = useState<Shape[]>([]);
@@ -251,8 +252,10 @@ export default function PatternFactory() {
     console.log("PatternFactory Stats", JSON.stringify({
       correct: numberCorrect,
       incorrect: numberWrong,
-      timeTaken: totalTimeTaken,
     }));
+
+    onComplete?.({correct: numberCorrect,
+      incorrect: numberWrong,})
   }, [gameOver, numberCorrect, numberWrong, totalTimeTaken]);
 
   useEffect(() => {
@@ -377,7 +380,7 @@ export default function PatternFactory() {
         </FadeIn>
         <FadeIn delay={200} distance={20} scaleFrom={0.9} duration={500}>
           <Image
-            source={require("@/assets/mochi_stale/mochi_think.svg")}
+            source={require("@/assets/mochi_stale/mochi_blocks.svg")}
             style={{
               width: 210,
               height: 300,

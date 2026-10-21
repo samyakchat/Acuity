@@ -22,6 +22,7 @@ import { CATEGORIES, findWord, type Category } from "./word-list";
 import { duration_sec, duration_ms, countd_max, stablems, 
     pausems, burstgap_ms, bins, force_category, DEBUG_TEXT_INPUT, fillers } from "./settings";
 import { Signpost, TreePine } from "lucide-react-native";
+import { routerObj } from "@/app/(patient)/tests/engine";
 const theme = {
   primary: "#2db35d",
   primaryEdge: "#1f8a46",
@@ -114,8 +115,8 @@ function analyse(events: WordEvent[]) {
     invalidCount: invalid.length,
     repeatCount: repeats.length,
     invalidRate: events.length ? round2(invalid.length / events.length) : null,
-    invalidWords: invalid.map((e) => e.raw),
-    repeatWords: repeats.map((e) => e.raw),
+    // invalidWords: invalid.map((e) => e.raw),
+    // repeatWords: repeats.map((e) => e.raw),
 
     timeToFirstWordMs: round(events.length ? events[0].tMs : null),
     timeToFirstValidMs: round(valid.length ? valid[0].tMs : null),
@@ -127,21 +128,21 @@ function analyse(events: WordEvent[]) {
     pauseCountOverThreshold: allPauses.filter((g) => g > pausems).length,
     pauseThresholdMs: pausems,
 
-    validPerBin,
+    // validPerBin,
     firstHalfValid: validPerBin.slice(0, bins / 2).reduce((a, b) => a + b, 0),
     secondHalfValid: validPerBin.slice(bins / 2).reduce((a, b) => a + b, 0),
     validWordsPerSec: round2(valid.length / duration_sec),
     meanWordLength: round2(mean(valid.map((e) => (e.word ?? "").length))),
 
-    semanticClusterSizes: clusterRuns,
+    // semanticClusterSizes: clusterRuns,
     semanticClusterCount: clusterRuns.filter((n) => n >= 2).length, //clusters of 2or more words
     semanticSwitches: Math.max(0, clusterRuns.length - 1),
     meanSemanticClusterSize: round2(mean(clusterRuns)),
-    subgroupsUsed: Array.from(new Set(valid.map((e) => e.cluster))),
+    // subgroupsUsed: Array.from(new Set(valid.map((e) => e.cluster))),
 
-    burstSizes: bursts,
-    burstCount: bursts.length,
-    meanBurstSize: round2(mean(bursts)),
+    // burstSizes: bursts,
+    // burstCount: bursts.length,
+    // meanBurstSize: round2(mean(bursts)),
   };
 }
 
@@ -234,7 +235,7 @@ const GardenUI = memo(({ planted, onPlantPress }: GardenUIProps) => {
 });
 
 
-export default function WordGarden() {
+export default function WordGarden({ onComplete }: { onComplete?: (result?: Record<string, unknown>) => void }){
   const [phase, setPhase] = useState<Phase>("intro");
   const [howOpen, setHowOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -519,35 +520,30 @@ export default function WordGarden() {
       sessionId: `${t0Ref.current}`,
       startedAt: startedAtRef.current,
       localHour: new Date(t0Ref.current).getHours(),
-      platform: Platform.OS,
-      attemptThisAppSession: sessionsPlayed + 1,
       category: cat.id,
       durationSec: duration_sec,
       micPermissionGranted: permissionRef.current,
-      howToPlayOpenedCount: howOpenedRef.current,
-
-      previous: lastSession,
-      validDeltaVsPrevious: lastSession ? metrics.validCount - lastSession.valid : null,
-      previousWasSameCategory: lastSession ? lastSession.category === cat.id : null,
+      // howToPlayOpenedCount: howOpenedRef.current,
 
       metrics,
-      events,
+      // events,
 
       fillerWordsHeard: fillersRef.current,
       wordsBeforeGoDropped: earlyRef.current,
       wordsAfterTimeDropped: lateRef.current,
-      recognition: {
-        restarts: restartsRef.current,
-        readyMsAfterGo: recStartRef.current ? recStartRef.current - t0Ref.current : null,
-        errors: errorsRef.current,
-        rawTranscripts: rawRef.current,
-      },
+      // recognition: {
+      //   restarts: restartsRef.current,
+      //   readyMsAfterGo: recStartRef.current ? recStartRef.current - t0Ref.current : null,
+      //   errors: errorsRef.current,
+      //   rawTranscripts: rawRef.current,
+      // },
     };
     console.log("[WordGarden] SESSION REPORT\n" + JSON.stringify(report, null, 2));
 
     lastSession = { valid: metrics.validCount, invalid: metrics.invalidCount, category: cat.id };
     sessionsPlayed += 1;
     gardenTrees.push(...planted);
+    onComplete?.(report)
   }
 
   function onTypedSubmit() {

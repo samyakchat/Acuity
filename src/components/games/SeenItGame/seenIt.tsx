@@ -1,6 +1,6 @@
 import { ThemedText } from "@/components/themed-text";
 import { Spacing } from "@/constants/theme";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { StyleSheet, View, Animated } from "react-native";
 import { FONT } from "@/components/fatUI/theme";
 import { useTheme } from "@/components/fatUI/theme";
@@ -11,11 +11,15 @@ import { Image } from "expo-image";
 import { Text } from "react-native";
 import FatSheet from "@/components/fatUI/fatSheet";
 import { getDefinition } from "@/components/games/SeenItGame/word-list";
+import { routerObj } from "@/app/(patient)/tests/engine";
 
 const chosen: string[] = [];
 let buttonCounter: number = 0;
 let seen: boolean = false;
-let correct: number = 0;
+let hit: number = 0;//seen and clicked seen
+let miss: number = 0;//seenitbut clicked new
+let fa: number = 0;//false alarm.. word was new userclickecd seenit
+let cr: number = 0;//correct rejectino in psych.. word was new user clicked new
 let previousWord: string | null = null;
 
 export function newWord(): string {
@@ -70,17 +74,21 @@ export function chooseWord(): string {
   return word;
 }
 
-export default function SeenIt() {
+export default function SeenIt({ onComplete }: { onComplete?: (result?: Record<string, unknown>) => void }) {
   const [open, setOpen] = useState(false);
   const [defOpen, setDefOpen] = useState(false);
   const theme = useTheme();
   const startedAt = useRef<number | null>(null);
+  const shownAt = useRef<number>(0);
+  const reactionTimes = useRef<number[]>([]);
   const [hasStarted, setHasStarted] = useState(false);
   const [currentWord, setCurrentWord] = useState("");
   const [gameStats, setGameStats] = useState<{
-    timeTaken: number;
-    correct: number;
-    incorrect: number;
+    hit: number;
+    miss: number;
+    fa: number;
+    cr: number;
+    reactionTimes: number[];
   } | null>(null);
   const [answeredCount, setAnsweredCount] = useState(0);
 
@@ -88,6 +96,10 @@ export default function SeenIt() {
   const opacityAnim = useRef(new Animated.Value(1)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const isAnimating = useRef(false);
+
+  useEffect(() => {
+    if (gameStats) onComplete?.(gameStats);
+  }, [gameStats]);
 
   function animateToNextWord(nextWordCallback: () => void) {
     isAnimating.current = true;
@@ -135,12 +147,19 @@ export default function SeenIt() {
     chosen.length = 0;
     buttonCounter = 0;
     seen = false;
-    correct = 0;
+    hit = 0;
+    miss = 0;
+    fa = 0;
+    cr = 0;
     previousWord = null;
+    reactionTimes.current = [];
     setAnsweredCount(0);
     setGameStats(null);
     startedAt.current = Date.now();
-    setCurrentWord(chooseWord());
+    
+    const word = chooseWord();
+    shownAt.current = Date.now();
+    setCurrentWord(word);
     setHasStarted(true);
 
     slideAnim.setValue(0);
@@ -154,26 +173,32 @@ export default function SeenIt() {
       return;
     }
 
-    if (clickedSeen === seen) {
-      correct += 1;
+    reactionTimes.current.push(Date.now() - shownAt.current);
+
+    if (seen) {
+      clickedSeen ? hit++ : miss++;
+    } else {
+      clickedSeen ? fa++ : cr++;
     }
 
     buttonCounter += 1;
     setAnsweredCount(buttonCounter);
 
     if (buttonCounter === 30) {
-      const startTime = startedAt.current;
-
       setGameStats({
-        timeTaken: startTime === null ? 0 : (Date.now() - startTime) / 1000,
-        correct,
-        incorrect: buttonCounter - correct,
+        hit,
+        miss,
+        fa,
+        cr,
+        reactionTimes: reactionTimes.current,
       });
       return;
     }
 
     animateToNextWord(() => {
-      setCurrentWord(chooseWord());
+      const nextWord = chooseWord();
+      shownAt.current = Date.now();
+      setCurrentWord(nextWord);
     });
   }
 
