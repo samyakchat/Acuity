@@ -10,14 +10,14 @@ import DigMeOut from "@/components/games/DigMeOut/digmeout";
 import PatternFactory from "@/components/games/PatternFactory/patternFactory";
 import { router, useLocalSearchParams } from "expo-router";
 import { ChevronRight } from "lucide-react-native";
-import { aptitudeList, recordResult, startSession, submitSession } from "../tests/engine";
+import { aptitudeList, checkAp, getUser, recordResult, startSession, submitSession } from "../tests/engine";
 import { useState, useEffect } from "react";
 import Intro from "@/components/activities/DelayedRecall/delayed";
 import { Ending } from "@/components/activities/DelayedRecall/delayed";
 import { Welcome, GameSection, ThankYou } from "@/components/activities/static";
 import SpeakUp from "@/components/activities/Orientation/speakup";
 import TaskOrder from "@/components/activities/BasicFunc/taskord";
-
+import { supabase } from "@/lib/supabase";
 
 export const registry = {
   "seenIt-10987": SeenIt,
@@ -34,7 +34,41 @@ export const registry = {
 
 };
 
+let usedList: any
+
 export default function GameLoader() {
+    useEffect(() => {
+      const check = async () => {
+        return await checkAp()
+      }
+
+      const depend = async () => {
+        const user = await getUser()
+        if (await finished===true) {
+          const { data, error } = await supabase
+            .from("daily_lists")
+            .select("data")
+            .eq("patient_id", user.id)
+            .order("list_date", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          if (error) throw error;
+
+          if (data) {
+            usedList = data.data.aptitudeList;
+            if (gameID === usedList[0]) startSession();
+          }
+        } else {
+          usedList = aptitudeList;
+          if (gameID === usedList[0]) startSession();
+        }
+      }
+
+      const finished = check();
+      depend();
+      
+    }, []);
   const theme = useTheme();
 
 
@@ -53,14 +87,15 @@ export default function GameLoader() {
     'basicfunc-1':theme.background
   };
 
-  const { gameID = aptitudeList[0] } = useLocalSearchParams<{ gameID?: string }>();
+  const { gameID = usedList[0] } = useLocalSearchParams<{ gameID?: string }>();
   const [isComplete, setIsComplete] = useState(false);
+
+
 
   useEffect(() => {
     setIsComplete(false);
   }, [gameID]);
 
-  useEffect(() => { if (gameID === aptitudeList[0]) startSession(); }, []);
 
 
   const RunningGame = registry[gameID as keyof typeof registry];
@@ -72,15 +107,15 @@ export default function GameLoader() {
   };
 
   const handleNextStep = async() => {
-    const currentIndex = aptitudeList.indexOf(gameID);
+    const currentIndex = usedList.indexOf(gameID);
     const nextIndex = currentIndex + 1;
 
-    if (nextIndex < aptitudeList.length) {
-      const nextGameID = aptitudeList[nextIndex];
+    if (nextIndex < usedList.length) {
+      const nextGameID = usedList[nextIndex];
       router.setParams({ gameID: nextGameID });
     } else {
       await submitSession();
-      router.replace("/testResults" as any);
+      router.replace("/(patient)/(tabs)")
     }
   };
 

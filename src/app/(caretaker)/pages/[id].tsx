@@ -17,6 +17,7 @@ import { ArrowLeft, Brain, CalendarDays, ChevronDown, CircleAlert, ClipboardList
 import FatButton from '@/components/fatUI/fatButton';
 import { useTheme, FONT } from '@/components/fatUI/theme';
 import BrainMap, { BAND_LABEL, ScoreBar, bandOf } from '@/components/brain/BrainMap';
+import DailyResults from '@/components/caretaker/DailyResults';
 import { summarizeAptitude, type AptitudeRaw, type AptitudeSummary } from '@/lib/aptitude';
 import { supabase } from '@/lib/supabase';
 
@@ -61,6 +62,7 @@ export default function PatientPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [dailyKey, setDailyKey] = useState(0);
 
   const requestId = useRef(0);
   const chevron = useRef(new Animated.Value(0)).current;
@@ -134,6 +136,7 @@ export default function PatientPage() {
             refreshing={refreshing}
             onRefresh={() => {
               setRefreshing(true);
+              setDailyKey((k) => k + 1);
               load();
             }}
             tintColor={theme.primary}
@@ -244,10 +247,7 @@ export default function PatientPage() {
                 {/* Brain */}
                 <Enter index={2}>
                   <View style={{ gap: 12 }}>
-                    <View style={styles.cardRow}>
-                      <Brain size={26} color={theme.primary} strokeWidth={2.5} />
-                      <Text style={[styles.sectionTitle, { color: theme.text }]}>By area of the brain</Text>
-                    </View>
+
                     <BrainMap regions={summary.regions} />
                     <Text style={[styles.body, { color: theme.textSoft, textAlign: 'center' }]}>
                       A simplified picture. Each game mainly relies on one area, but the brain works as a whole.
@@ -292,16 +292,7 @@ export default function PatientPage() {
               </View>
             )
           ) : (
-            <Enter index={0}>
-              <View style={styles.emptyBox}>
-                <CalendarDays size={34} color={theme.textSoft} strokeWidth={2.25} />
-                <Text style={[styles.emptyTitle, { color: theme.text }]}>Daily results are coming</Text>
-                <Text style={[styles.emptyText, { color: theme.textSoft }]}>
-                  Once {name || 'your patient'} completes daily check-ins, you'll see how each day compares to their
-                  baseline here.
-                </Text>
-              </View>
-            </Enter>
+            <DailyResults patientId={patientId} name={name} refreshKey={dailyKey} />
           )}
         </View>
       </ScrollView>

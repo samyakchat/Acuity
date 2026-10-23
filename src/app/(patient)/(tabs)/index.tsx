@@ -1,17 +1,17 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Animated, Easing, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Ellipse, Path } from 'react-native-svg';
 import { router, useFocusEffect } from 'expo-router';
 import { CalendarCheck, ChevronRight, CircleAlert, CircleCheck, LogOut } from 'lucide-react-native';
 import FatButton from '@/components/fatUI/fatButton';
 import { useTheme, FONT } from '@/components/fatUI/theme';
 import { supabase } from '@/lib/supabase';
-import { checkAp } from '../tests/engine';
+import { checkAp, setAptitudeList } from '../tests/engine';
 import { Image } from 'expo-image';
 
+type DailyPlan = { date: string; list: string[] };
+
 function MochiArt({ size = 150 }: { size?: number }) {
-  const theme = useTheme();
   const bob = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -64,12 +64,25 @@ function greeting() {
   return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
 }
 
+function formatListDate(raw: string) {
+  const [y, m, d] = raw.slice(0, 10).split('-').map(Number);
+  if (!y || !m || !d) return raw;
+  return new Date(y, m - 1, d + 1).toLocaleDateString(undefined, {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+
 export default function PatientHome() {
   const theme = useTheme();
   const press = useRef(new Animated.Value(1)).current;
+  const dailyPress = useRef(new Animated.Value(1)).current;
 
   const [name, setName] = useState('');
   const [passedApt, setPassedApt] = useState<boolean | null>(null); // null = still checking
+  const [daily, setDaily] = useState<DailyPlan | null>(null); // latest list from supabase
+  const [doneToday, setDoneToday] = useState(false); // a daily result already exists for today
   const [failed, setFailed] = useState(false);
 
   const load = useCallback(async () => {
@@ -80,7 +93,41 @@ export default function PatientHome() {
       } = await supabase.auth.getUser();
       const full = (user?.user_metadata?.full_name as string | undefined) ?? '';
       setName(full.trim().split(' ')[0] ?? '');
-      setPassedApt(await checkAp());
+
+      const passed = await checkAp();
+      setPassedApt(passed);
+
+      if (passed && user) {
+        // same query the renderer (gametemp) uses, so the card and the games always agree
+        const { data, error } = await supabase
+          .from('daily_lists')
+          .select('list_date, data')
+          .eq('patient_id', user.id)
+          .order('list_date', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        const list = data?.data?.aptitudeList;
+        setDaily(Array.isArray(list) && list.length > 0 ? { date: data!.list_date, list } : null);
+
+        // already took it today? (local midnight to local midnight)
+        const start = new Date();
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(start);
+        end.setDate(end.getDate() + 1);
+
+        const { count, error: resultsError } = await supabase
+          .from('daily_results')
+          .select('*', { count: 'exact', head: true })
+          .eq('patient_id', user.id)
+          .gte('taken_at', start.toISOString())
+          .lt('taken_at', end.toISOString());
+
+        if (resultsError) throw resultsError;
+        setDoneToday((count ?? 0) > 0);
+      }
     } catch (e) {
       console.log(e);
       setFailed(true);
@@ -106,20 +153,33 @@ export default function PatientHome() {
           text: "Log Out", 
           style: "destructive",
           onPress: () => supabase.auth.signOut()
+        },
+        {
+          text: "dev",
+          onPress: () => setAptitudeList()
         }
       ],
       { cancelable: true }
     );
     
   }
+
   const startAptitude = () =>
     router.push({
       pathname: '/(patient)/gamePages/gametemp',
       params: { gameID: 'welcome' },
     });
 
-  const pressTo = (v: number) =>
-    Animated.spring(press, { toValue: v, friction: 6, tension: 140, useNativeDriver: true }).start();
+  const startDaily = () => {
+    if (!daily || doneToday) return;
+    router.push({
+      pathname: '/(patient)/gamePages/gametemp',
+      params: { gameID: daily.list[0] },
+    });
+  };
+
+  const pressTo = (anim: Animated.Value, v: number) =>
+    Animated.spring(anim, { toValue: v, friction: 6, tension: 140, useNativeDriver: true }).start();
 
   return (
     <SafeAreaView style={[styles.screen, { backgroundColor: theme.background }]}>
@@ -163,8 +223,8 @@ export default function PatientHome() {
               <Animated.View style={{ transform: [{ scale: press }] }}>
                 <Pressable
                   onPress={startAptitude}
-                  onPressIn={() => pressTo(0.97)}
-                  onPressOut={() => pressTo(1)}
+                  onPressIn={() => pressTo(press, 0.97)}
+                  onPressOut={() => pressTo(press, 1)}
                   accessibilityRole="button"
                   accessibilityLabel="Start your first check-in with Mochi"
                   style={[styles.hero, { backgroundColor: theme.primary }]}
@@ -189,23 +249,62 @@ export default function PatientHome() {
                 </View>
               </Enter>
 
-              <Enter index={2}>
+              {daily && doneToday ? (
+                <Enter index={2}>
+                  <View style={[styles.card, { backgroundColor: theme.fieldBg, borderColor: theme.line }]}>
+                    <View style={styles.cardRow}>
+                      <CircleCheck size={22} color={theme.primary} strokeWidth={2.5} />
+                      <Text style={[styles.cardTitle, { color: theme.text }]}>Daily activity done</Text>
+                    </View>
+                    <Text style={[styles.cardBody, { color: theme.textSoft }]}>
+                      Great work today! Come back tomorrow for the next one.
+                    </Text>
+                  </View>
+                </Enter>
+              ) : daily ? (
+                <Enter index={2}>
+                  <Animated.View style={{ transform: [{ scale: dailyPress }] }}>
+                    <Pressable
+                      onPress={startDaily}
+                      onPressIn={() => pressTo(dailyPress, 0.97)}
+                      onPressOut={() => pressTo(dailyPress, 1)}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Start your daily activity for ${formatListDate(daily.date)}`}
+                      style={[styles.hero, { backgroundColor: theme.primary }]}
+                    >
+                      <View style={styles.datePill}>
+                        <CalendarCheck size={20} color="#FFFFFF" strokeWidth={2.5} />
+                        <Text style={styles.datePillText}>{formatListDate(daily.date)}</Text>
+                      </View>
+                      <Text style={styles.heroTitle}>Your daily activity</Text>
+                      <View style={styles.heroPill}>
+                        <Text style={[styles.heroPillText, { color: theme.primary }]}>Let's go</Text>
+                        <ChevronRight size={24} color={theme.primary} strokeWidth={3} />
+                      </View>
+                    </Pressable>
+                  </Animated.View>
+                </Enter>
+              ) : (
+                <Enter index={2}>
+                  <View style={[styles.card, { backgroundColor: theme.fieldBg, borderColor: theme.line }]}>
+                    <View style={styles.cardRow}>
+                      <CalendarCheck size={22} color={theme.primary} strokeWidth={2.5} />
+                      <Text style={[styles.cardTitle, { color: theme.text }]}>Daily activity</Text>
+                    </View>
+                    <Text style={[styles.cardBody, { color: theme.textSoft }]}>
+                      Nothing is ready yet. Check back soon!
+                    </Text>
+                  </View>
+                </Enter>
+              )}
+
+              <Enter index={3}>
                 <View style={[styles.card, { backgroundColor: theme.fieldBg, borderColor: theme.line }]}>
                   <View style={styles.cardRow}>
                     <CircleCheck size={22} color={theme.primary} strokeWidth={2.5} />
                     <Text style={[styles.cardTitle, { color: theme.text }]}>Introduction Activity Done</Text>
                   </View>
                   <Text style={[styles.cardBody, { color: theme.textSoft }]}>Mochi has gotten to learn you, thank you!</Text>
-                </View>
-              </Enter>
-
-              {/* HARDCODED placeholder until daily tests exist */}
-              <Enter index={3}>
-                <View style={[styles.card, { backgroundColor: theme.fieldBg, borderColor: theme.line }]}>
-                  <View style={styles.cardRow}>
-                    <Text style={[styles.cardTitle, { color: theme.text }]}>Daily check-in</Text>
-                  </View>
-                  <Text style={[styles.cardBody, { color: theme.textSoft }]}>holdup on that</Text>
                 </View>
               </Enter>
             </View>
@@ -246,6 +345,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   heroPillText: { fontFamily: FONT.heavy, fontSize: 20, lineHeight: 26 },
+
+  datePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+  },
+  datePillText: { fontFamily: FONT.bold, fontSize: 18, lineHeight: 24, color: '#FFFFFF' },
 
   mochiRow: { alignItems: 'center' },
 
