@@ -3,23 +3,17 @@ import { Animated, Easing, LayoutAnimation, Pressable, StyleSheet, Text, View } 
 import Svg, { ClipPath, Defs, G, LinearGradient, Path, Stop } from 'react-native-svg';
 import { useTheme, FONT } from '@/components/fatUI/theme';
 
-/* ------------------------------------------------------------------ */
-/* Types + shared helpers (the daily results page reuses all of these) */
-/* ------------------------------------------------------------------ */
 
 export type BrainRegionId = 'frontal' | 'parietal' | 'temporal' | 'occipital' | 'cerebellum';
 
 export type BrainMeasure = {
   label: string;
-  /** Human readable result, e.g. "3 of 3 correct" */
   value: string;
-  /** 0-100, or null when it couldn't be measured */
   score: number | null;
 };
 
 export type BrainRegion = {
   id: BrainRegionId;
-  /** 0-100, or null when nothing in this region was measured */
   score: number | null;
   measures: BrainMeasure[];
 };
@@ -73,7 +67,6 @@ export function ScoreBar({ score }: { score: number | null }) {
   const fill = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    // width can't use the native driver
     Animated.timing(fill, {
       toValue: score ?? 0,
       duration: 500,
@@ -96,46 +89,25 @@ export function ScoreBar({ score }: { score: number | null }) {
   );
 }
 
-/* ------------------------------------------------------------------ */
-/* Brain artwork: lateral view, front on the left                       */
-/* Anatomical folds are deliberately subtle and clipped to each lobe. */
-/* ------------------------------------------------------------------ */
-
-// Lateral silhouette shaped to match the supplied reference: a broad domed
-// cerebrum, a fuller anterior pole, a deeper lower temporal curve, and a
-// distinct posterior cerebellum with a tapered, angled brainstem.
 const CEREBRUM_OUTLINE =
   'M140,8 C131,7 122,9 115,12 C104,10 93,12 81,18 C72,18 63,23 58,28 C50,28 45,33 39,40 C31,45 27,51 25,59 C20,64 17,70 16,77 C11,83 10,89 14,96 C10,103 11,111 14,118 C16,129 23,137 33,142 C40,146 49,149 55,151 C57,156 59,162 62,167 C61,172 68,176 75,180 C87,188 98,191 111,192 C123,194 137,192 148,190 C155,197 160,204 165,214 C171,225 178,240 185,249 C190,254 198,253 201,248 C201,241 197,232 196,226 C207,229 220,231 233,229 C247,227 257,222 263,214 C269,207 271,200 267,193 C280,195 292,191 299,183 C306,174 308,160 306,146 C306,131 301,114 294,101 C292,92 286,83 280,76 C277,66 269,57 260,50 C254,41 244,33 232,26 C222,20 211,17 201,17 C190,11 179,8 166,10 C157,7 148,7 140,8 Z';
 
 const PATHS: Record<BrainRegionId, string> = {
-  // The frontal pole follows the rounded front and curves down into the
-  // lower frontal surface. Its posterior edge is the central sulcus.
   frontal:
     'M115,12 C122,30 121,47 119,62 C117,78 113,93 111,103 C99,109 92,119 85,130 C77,143 66,151 55,151 C49,149 40,146 33,142 C23,137 16,129 14,118 C11,111 10,103 14,96 C10,89 11,83 16,77 C17,70 20,64 25,59 C27,51 31,45 39,40 C45,33 50,28 58,28 C63,23 72,18 81,18 C93,12 104,10 115,12 Z',
-  // The parietal lobe makes up the long upper dome between the central
-  // sulcus and the curved occipital boundary.
   parietal:
     'M115,12 C131,7 148,7 166,10 C179,8 190,11 201,17 C211,17 222,20 232,26 C244,33 254,41 260,50 C256,65 252,83 249,102 C207,92 150,90 111,103 C113,93 117,78 119,62 C121,47 122,30 115,12 Z',
-  // The occipital lobe rounds down at the rear and meets the cerebellum
-  // rather than ending in a straight, angular edge.
   occipital:
     'M260,50 C269,57 277,66 280,76 C286,83 292,92 294,101 C301,114 306,131 306,146 C308,160 306,174 299,183 C292,191 280,195 267,193 C263,170 257,143 249,102 C252,83 256,65 260,50 Z',
-  // The temporal lobe forms the deeper, sweeping lower curve of the
-  // cerebrum, from the lateral fissure toward the posterior underside.
   temporal:
     'M111,103 C150,90 207,92 249,102 C253,128 260,154 267,193 C251,187 233,178 214,166 C205,162 196,161 188,167 C178,175 167,184 148,190 C137,192 123,194 111,192 C98,191 87,188 75,180 C68,176 61,172 62,167 C59,162 57,156 55,151 C66,151 77,143 85,130 C92,119 99,109 111,103 Z',
-  // The cerebellum sits under the posterior lobe as a rounded lower mass.
   cerebellum:
     'M188,167 C196,161 205,162 214,166 C233,178 251,187 267,193 C271,200 269,207 263,214 C257,222 247,227 233,229 C220,231 207,229 196,226 C192,213 187,201 180,190 C182,180 184,173 188,167 Z',
 };
 
-// Tapered brainstem, angled down and slightly forward, behind the cerebellum.
 const STEM =
   'M148,190 C155,197 160,204 165,214 C171,225 178,240 185,249 C190,254 198,253 201,248 C200,240 196,231 194,221 C192,208 187,194 183,178 C178,178 173,179 169,181 C162,185 156,191 148,190 Z';
 
-
-// Curated cortical sulci. Each set is clipped to its own region so the grooves
-// follow the anatomy instead of wandering across lobe boundaries.
 const CORTICAL_FOLDS: Record<BrainRegionId, string[]> = {
   frontal: [
     'M27 66 C34 58 43 58 49 64 C55 70 52 77 45 82',
@@ -174,7 +146,6 @@ const CORTICAL_FOLDS: Record<BrainRegionId, string[]> = {
     'M294 132 C299 140 295 148 289 153 C284 158 286 165 291 170',
     'M279 173 C284 178 283 184 278 189',
   ],
-  // Keep the cerebellum smooth; detailed folia are intentionally omitted.
   cerebellum: [],
 };
 
@@ -199,18 +170,14 @@ const CORTICAL_FINE_FOLDS: Partial<Record<BrainRegionId, string[]>> = {
     'M270 118 C276 113 282 115 285 120',
     'M297 164 C300 169 297 175 293 178',
   ],
-  // No fine texture on the cerebellum.
   cerebellum: [],
 };
 
-/* ------------------------------------------------------------------ */
-/* Component                                                           */
-/* ------------------------------------------------------------------ */
+
 
 type Props = {
   regions: BrainRegion[];
   initial?: BrainRegionId;
-  /** Shown under the detail title when a region has no data */
   emptyText?: string;
 };
 
@@ -289,15 +256,12 @@ export default function BrainMap({ regions, initial = 'frontal', emptyText }: Pr
             })}
           </G>
 
-          {/* Restrained surface lighting adds volume without washing out scores. */}
           <G pointerEvents="none">
             {(['cerebellum', 'occipital', 'temporal', 'parietal', 'frontal'] as BrainRegionId[]).map((id) => (
               <Path key={`sheen-${id}`} d={PATHS[id]} fill="url(#brainSurfaceSheen)" />
             ))}
           </G>
 
-          {/* Cortical grooves are paired with a very faint offset edge. Clipping
-              each lobe prevents stray strokes at anatomical boundaries. */}
           {REGION_ORDER.map((id) => (
             <G key={`folds-${id}`} clipPath={`url(#${id}Clip)`} pointerEvents="none" fill="none">
               <G stroke="#12485A" strokeWidth={1.35} strokeLinecap="round" strokeLinejoin="round" opacity={0.42}>
@@ -312,11 +276,8 @@ export default function BrainMap({ regions, initial = 'frontal', emptyText }: Pr
             </G>
           ))}
 
-          {/* A single quiet silhouette edge replaces the heavy white seams. */}
           <Path d={CEREBRUM_OUTLINE} fill="none" stroke="#24596B" strokeWidth={1.05} strokeOpacity={0.72} pointerEvents="none" />
 
-          {/* Keep region taps reliable even with texture and lighting above the fills.
-              These nearly transparent paths sit on top and preserve each lobe's hit area. */}
           <G pointerEvents="auto">
             {(['cerebellum', 'occipital', 'temporal', 'parietal', 'frontal'] as BrainRegionId[]).map((id) => (
               <Path

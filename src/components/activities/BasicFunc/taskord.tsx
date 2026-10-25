@@ -4,7 +4,6 @@ import { StyleSheet, Text, View } from "react-native";
 import { FONT, useTheme } from "@/components/fatUI/theme";
 import FatButton from "@/components/fatUI/fatButton";
 
-// Steps are listed in the correct order. They are shuffled when shown.
 const TASKS = [
   {
     title: "You are leaving the house.",

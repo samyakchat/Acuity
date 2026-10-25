@@ -62,7 +62,6 @@ export default function SpeakUp({ onComplete }: { onComplete?: (result?: Record<
   const [phase, setPhase] = useState<Phase>("ready");
   const [message, setMessage] = useState("");
 
-  // Timing and transcript live in refs so the speech events never see stale values.
   const pressedAt = useRef(0);
   const firstWordAt = useRef<number | null>(null);
   const lastWordAt = useRef<number | null>(null);
@@ -70,7 +69,6 @@ export default function SpeakUp({ onComplete }: { onComplete?: (result?: Record<
   const interimText = useRef("");
   const finished = useRef(false);
 
-  // Gentle pulse on the "Listening" label.
   const pulse = useRef(new Animated.Value(1)).current;
   useEffect(() => {
     if (phase !== "listening") return;

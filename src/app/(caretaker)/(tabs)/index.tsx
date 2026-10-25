@@ -7,7 +7,6 @@ import FatButton from '@/components/fatUI/fatButton';
 import { useTheme, FONT } from '@/components/fatUI/theme';
 import { supabase } from '@/lib/supabase';
 
-/* Same staggered fade + rise as the pairing list */
 function Enter({ index, children }: { index: number; children: React.ReactNode }) {
   const enter = useRef(new Animated.Value(0)).current;
 
@@ -30,7 +29,6 @@ function greeting() {
   return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
 }
 
-// HARDCODED: static copy for the "How it works" card
 const STEPS = [
   { icon: KeyRound, title: 'Pair', body: 'Enter the code shown on your patient\'s device.' },
   { icon: ClipboardList, title: 'Review', body: 'See their starting baseline, area by area.' },
@@ -64,14 +62,12 @@ export default function CaretakerHome() {
     }
   }, []);
 
-  // refresh the count whenever the caretaker comes back to this screen
   useFocusEffect(
     useCallback(() => {
       load();
     }, [load]),
   );
 
-  // HARDCODED: route to the pairing page. Change if your path differs.
   const goPatients = () => router.push('/pairingPage' as any);
 
   const pressTo = (v: number) =>

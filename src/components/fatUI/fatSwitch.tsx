@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { darken, useTheme } from '@/components/fatUI/theme';
 
-// Matches FatButton "small": 56 face height, 4 edge, 16 radius.
 const HEIGHT = 56;
 const EDGE = 4;
 const RADIUS = 16;
@@ -16,15 +15,15 @@ export type FatSwitchProps = {
   onValueChange: (value: boolean) => void;
   disabled?: boolean;
 
-  // overrides
-  color?: string; // track color when ON (defaults to theme.primary)
-  edgeColor?: string; // ON edge (defaults to darkened `color`, or theme.primaryEdge)
-  offColor?: string; // track color when OFF (defaults to theme.secondaryFace)
-  offEdgeColor?: string; // OFF edge (defaults to darkened `offColor`, or theme.secondaryEdge)
-  thumbColor?: string; // knob face when ON (defaults to white)
-  thumbEdgeColor?: string; // knob underside when ON
-  offThumbColor?: string; // knob face when OFF (defaults to gray in light mode, white in dark mode)
-  offThumbEdgeColor?: string; // knob underside when OFF
+  //overrides
+  color?: string; 
+  edgeColor?: string; 
+  offColor?: string; 
+  offEdgeColor?: string; 
+  thumbColor?: string; 
+  thumbEdgeColor?: string;
+  offThumbColor?: string; 
+  offThumbEdgeColor?: string; 
 
   style?: StyleProp<ViewStyle>;
   accessibilityLabel?: string;
@@ -115,11 +114,9 @@ export default function FatSwitch({
       style={[{ width: WIDTH, opacity: disabled ? 0.5 : 1 }, style]}
     >
       <View style={{ width: WIDTH, height: HEIGHT + EDGE }}>
-        {/* Edge (the 3D underside), crossfades between off and on */}
         <View style={[styles.edge, { backgroundColor: offEdge }]} />
         <Animated.View style={[styles.edge, { backgroundColor: onEdge, opacity: onOpacity }]} />
 
-        {/* Face */}
         <Animated.View style={[styles.face, { transform: [{ translateY: y }] }]}>
           <View style={[styles.layer, layer(offFace, offEdge)]} />
           <Animated.View style={[styles.layer, layer(onFace, onEdge), { opacity: onOpacity }]} />

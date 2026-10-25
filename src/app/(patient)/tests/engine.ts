@@ -99,7 +99,7 @@ export async function submitSession() {
     return data.id;
 }
 
-//claude natifve code below beware it may be buggy asl
+//code below is statistics engine designed by me and srishanth, abhi when testing be careful
 
 type Trend = "improving" | "stable" | "declining" | "insufficient";
 type Summary = {
@@ -112,7 +112,6 @@ const HISTORY_DAYS = 7;
 const MIN_ENTRIES = 3;       
 const TREND_DELTA = 0.08;    
 
-// ---------- helpers ----------
 const num = (v: unknown): number | null => (typeof v === "number" && isFinite(v) ? v : null);
 const clamp = (n: number) => Math.max(0, Math.min(1, n));
 const r2 = (n: number | null) => (n === null ? null : Math.round(n * 100) / 100);

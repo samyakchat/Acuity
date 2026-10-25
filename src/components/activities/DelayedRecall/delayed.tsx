@@ -7,8 +7,6 @@ import { WORDS } from "@/components/games/SeenItGame/word-list";
 const WORD_COUNT = 3;
 const GRID_SIZE = 16;
 
-// Lives at module level so it survives navigating to other pages
-// (it resets if the app is fully closed).
 let storedWords: string[] = [];
 
 function shuffle<T>(items: T[]): T[] {
@@ -20,11 +18,9 @@ function shuffle<T>(items: T[]): T[] {
   return copy;
 }
 
-/** Part 1: show 3 words to memorize and save them. */
 function Intro({ onComplete }: { onComplete?: () => void }) {
   const theme = useTheme();
 
-  // Picked once per mount, and saved right away.
   const [words] = useState(() => {
     const picked = shuffle(WORDS).slice(0, WORD_COUNT);
     storedWords = picked;
@@ -62,13 +58,11 @@ function Intro({ onComplete }: { onComplete?: () => void }) {
   );
 }
 
-/** Part 2: pick the 3 original words out of a grid of 16. */
 function Ending({ onComplete }: { onComplete?: (result?: Record<string, unknown>) => void }) {
   const theme = useTheme();
   const startedAt = useRef(Date.now());
   const [selected, setSelected] = useState<string[]>([]);
 
-  // The 3 saved words plus 13 others, shuffled once.
   const [grid] = useState(() => {
     const others = shuffle(WORDS.filter((w) => !storedWords.includes(w))).slice(
       0,

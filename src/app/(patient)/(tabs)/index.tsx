@@ -80,9 +80,9 @@ export default function PatientHome() {
   const dailyPress = useRef(new Animated.Value(1)).current;
 
   const [name, setName] = useState('');
-  const [passedApt, setPassedApt] = useState<boolean | null>(null); // null = still checking
-  const [daily, setDaily] = useState<DailyPlan | null>(null); // latest list from supabase
-  const [doneToday, setDoneToday] = useState(false); // a daily result already exists for today
+  const [passedApt, setPassedApt] = useState<boolean | null>(null); 
+  const [daily, setDaily] = useState<DailyPlan | null>(null);
+  const [doneToday, setDoneToday] = useState(false); 
   const [failed, setFailed] = useState(false);
 
   const load = useCallback(async () => {
@@ -98,7 +98,6 @@ export default function PatientHome() {
       setPassedApt(passed);
 
       if (passed && user) {
-        // same query the renderer (gametemp) uses, so the card and the games always agree
         const { data, error } = await supabase
           .from('daily_lists')
           .select('list_date, data')
@@ -112,7 +111,6 @@ export default function PatientHome() {
         const list = data?.data?.aptitudeList;
         setDaily(Array.isArray(list) && list.length > 0 ? { date: data!.list_date, list } : null);
 
-        // already took it today? (local midnight to local midnight)
         const start = new Date();
         start.setHours(0, 0, 0, 0);
         const end = new Date(start);
@@ -218,7 +216,6 @@ export default function PatientHome() {
           ) : passedApt === null ? (
             <ActivityIndicator size="large" color={theme.primary} style={{ marginTop: 24 }} />
           ) : !passedApt ? (
-            /* First visit: one big, obvious thing to tap */
             <Enter index={1}>
               <Animated.View style={{ transform: [{ scale: press }] }}>
                 <Pressable

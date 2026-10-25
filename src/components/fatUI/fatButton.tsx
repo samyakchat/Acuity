@@ -36,7 +36,7 @@ export type FatButtonProps = {
   loading?: boolean;
   loadingText?: string;
 
-//overrides
+  //srishanth these r the overrides
   color?: string;
   edgeColor?: string;
   textColor?: string;
@@ -44,12 +44,11 @@ export type FatButtonProps = {
   iconSize?: number;
   height?: number;
 
-  // all optional, defaults keep existing behavior
-  iconFill?: string; // fills the icon shape (stroke still uses textColor)
-  iconOnly?: boolean; // don't render the label Text at all (no stray gap)
-  edgeDepth?: number; // overrides the size preset's bottom edge thickness
-  radius?: number; // overrides the size preset's corner radius
-  inert?: boolean; // display-only: no press animation, not announced as a button
+  iconFill?: string; //fills the icon shape (stroke still uses textColor)
+  iconOnly?: boolean; //don't render the label Text at all (no stray gap)
+  edgeDepth?: number; //overrides the size preset's bottom edge thickness
+  radius?: number; //overrides the size preset's corner radius
+  inert?: boolean; //display-only: no press animation, not announced as a button
 
   style?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
