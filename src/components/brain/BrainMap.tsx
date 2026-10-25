@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, LayoutAnimation, Pressable, StyleSheet, Text, View } from 'react-native';
-import Svg, { G, Path } from 'react-native-svg';
+import Svg, { ClipPath, Defs, G, LinearGradient, Path, Stop } from 'react-native-svg';
 import { useTheme, FONT } from '@/components/fatUI/theme';
 
 /* ------------------------------------------------------------------ */
@@ -98,8 +98,7 @@ export function ScoreBar({ score }: { score: number | null }) {
 
 /* ------------------------------------------------------------------ */
 /* Brain artwork: lateral view, front on the left                       */
-/* Shape and lobe placement come first; cortical folds are intentionally
-   omitted for now so the anatomy reads clearly at app-icon scale.       */
+/* Anatomical folds are deliberately subtle and clipped to each lobe. */
 /* ------------------------------------------------------------------ */
 
 // Lateral silhouette shaped to match the supplied reference: a broad domed
@@ -133,6 +132,76 @@ const PATHS: Record<BrainRegionId, string> = {
 // Tapered brainstem, angled down and slightly forward, behind the cerebellum.
 const STEM =
   'M148,190 C155,197 160,204 165,214 C171,225 178,240 185,249 C190,254 198,253 201,248 C200,240 196,231 194,221 C192,208 187,194 183,178 C178,178 173,179 169,181 C162,185 156,191 148,190 Z';
+
+
+// Curated cortical sulci. Each set is clipped to its own region so the grooves
+// follow the anatomy instead of wandering across lobe boundaries.
+const CORTICAL_FOLDS: Record<BrainRegionId, string[]> = {
+  frontal: [
+    'M27 66 C34 58 43 58 49 64 C55 70 52 77 45 82',
+    'M22 91 C30 84 38 86 42 93 C46 100 41 107 34 112',
+    'M31 122 C38 127 46 125 51 119 C56 113 58 107 65 103',
+    'M44 43 C51 36 60 37 64 44 C68 50 64 57 59 61',
+    'M62 29 C69 25 76 29 78 36 C80 42 76 47 71 51',
+    'M83 21 C91 26 93 33 89 41 C86 47 85 54 89 61',
+    'M102 17 C108 25 108 33 104 42 C100 50 102 58 107 66',
+    'M105 75 C99 81 97 88 100 94',
+  ],
+  parietal: [
+    'M132 18 C141 25 141 33 136 40 C131 47 134 54 141 59',
+    'M153 14 C162 21 163 29 158 37 C153 44 157 51 164 57',
+    'M176 15 C185 22 186 30 181 37 C177 44 181 51 189 57',
+    'M199 23 C207 29 208 37 202 44 C197 50 201 57 209 63',
+    'M222 32 C231 40 230 47 225 54 C220 60 223 67 231 73',
+    'M244 49 C251 56 251 64 246 71 C242 77 245 84 251 90',
+    'M145 72 C157 65 168 68 174 75 C179 81 176 86 169 89',
+    'M188 68 C199 62 211 66 216 73 C221 79 217 85 210 89',
+  ],
+  temporal: [
+    'M78 150 C89 143 100 146 107 153 C114 160 123 161 131 155',
+    'M79 166 C91 160 101 163 109 170 C117 176 129 176 138 170',
+    'M91 181 C101 177 109 181 117 185',
+    'M124 116 C135 109 146 111 151 118 C156 124 152 131 145 135',
+    'M157 109 C168 103 179 106 184 113 C189 120 184 127 178 131',
+    'M192 109 C203 104 214 108 218 115 C222 122 218 128 212 133',
+    'M227 119 C237 117 242 123 242 130 C243 137 239 143 234 147',
+    'M171 145 C181 139 191 142 197 148 C202 154 198 161 192 165',
+    'M132 145 C142 139 151 142 156 148',
+  ],
+  occipital: [
+    'M266 64 C273 72 273 80 267 87 C262 93 264 100 271 105',
+    'M283 91 C289 99 288 107 282 113 C277 119 280 126 286 131',
+    'M294 132 C299 140 295 148 289 153 C284 158 286 165 291 170',
+    'M279 173 C284 178 283 184 278 189',
+  ],
+  // Keep the cerebellum smooth; detailed folia are intentionally omitted.
+  cerebellum: [],
+};
+
+const CORTICAL_FINE_FOLDS: Partial<Record<BrainRegionId, string[]>> = {
+  frontal: [
+    'M36 52 C42 47 48 47 52 51',
+    'M58 101 C64 94 71 91 78 93',
+    'M78 71 C84 65 91 65 96 69',
+  ],
+  parietal: [
+    'M126 49 C132 43 138 44 143 48',
+    'M168 32 C174 27 180 29 184 33',
+    'M204 83 C213 77 223 79 227 84',
+    'M231 58 C237 55 242 58 245 62',
+  ],
+  temporal: [
+    'M99 132 C106 126 113 127 118 131',
+    'M149 157 C158 151 166 153 171 157',
+    'M203 139 C211 135 220 138 224 143',
+  ],
+  occipital: [
+    'M270 118 C276 113 282 115 285 120',
+    'M297 164 C300 169 297 175 293 178',
+  ],
+  // No fine texture on the cerebellum.
+  cerebellum: [],
+};
 
 /* ------------------------------------------------------------------ */
 /* Component                                                           */
@@ -181,16 +250,26 @@ export default function BrainMap({ regions, initial = 'frontal', emptyText }: Pr
     <View style={styles.wrap}>
       <Animated.View style={{ transform: [{ scale: pulse }] }}>
         <Svg width="100%" height={250} viewBox="0 0 320 260">
+          <Defs>
+            <LinearGradient id="brainSurfaceSheen" x1="0" y1="0" x2="0.82" y2="1">
+              <Stop offset="0%" stopColor="#BFEAF2" stopOpacity={0.2} />
+              <Stop offset="42%" stopColor="#BFEAF2" stopOpacity={0.025} />
+              <Stop offset="100%" stopColor="#07384A" stopOpacity={0.13} />
+            </LinearGradient>
+            <ClipPath id="frontalClip"><Path d={PATHS.frontal} /></ClipPath>
+            <ClipPath id="parietalClip"><Path d={PATHS.parietal} /></ClipPath>
+            <ClipPath id="temporalClip"><Path d={PATHS.temporal} /></ClipPath>
+            <ClipPath id="occipitalClip"><Path d={PATHS.occipital} /></ClipPath>
+            <ClipPath id="cerebellumClip"><Path d={PATHS.cerebellum} /></ClipPath>
+          </Defs>
+
+          {/* A quiet base silhouette unifies the lobes and stem. */}
           <Path d={CEREBRUM_OUTLINE} fill={theme.line} />
-          <Path
-            d={STEM}
-            fill={theme.line}
-            stroke={theme.background}
-            strokeWidth={2.5}
-            strokeLinejoin="round"
-          />
+          <Path d={STEM} fill={theme.line} stroke="#24596B" strokeWidth={0.9} strokeLinejoin="round" />
+
+          {/* Score overlays remain separate, selectable regions. Boundaries use
+              muted blue-green ink rather than bright background-colored seams. */}
           <G>
-            {/* cerebellum first so the lobes sit on top of it */}
             {(['cerebellum', 'occipital', 'temporal', 'parietal', 'frontal'] as BrainRegionId[]).map((id) => {
               const band = bandOf(byId.get(id)?.score ?? null);
               const isSel = id === selected;
@@ -200,13 +279,55 @@ export default function BrainMap({ regions, initial = 'frontal', emptyText }: Pr
                   d={PATHS[id]}
                   fill={band === 'none' ? theme.line : theme.primary}
                   fillOpacity={BAND_OPACITY[band]}
-                  stroke={isSel ? theme.text : theme.background}
-                  strokeWidth={isSel ? 2.5 : 1.2}
+                  stroke={isSel ? '#174758' : '#2E6878'}
+                  strokeOpacity={isSel ? 0.95 : 0.58}
+                  strokeWidth={isSel ? 1.65 : 0.8}
                   strokeLinejoin="round"
                   onPress={() => select(id)}
                 />
               );
             })}
+          </G>
+
+          {/* Restrained surface lighting adds volume without washing out scores. */}
+          <G pointerEvents="none">
+            {(['cerebellum', 'occipital', 'temporal', 'parietal', 'frontal'] as BrainRegionId[]).map((id) => (
+              <Path key={`sheen-${id}`} d={PATHS[id]} fill="url(#brainSurfaceSheen)" />
+            ))}
+          </G>
+
+          {/* Cortical grooves are paired with a very faint offset edge. Clipping
+              each lobe prevents stray strokes at anatomical boundaries. */}
+          {REGION_ORDER.map((id) => (
+            <G key={`folds-${id}`} clipPath={`url(#${id}Clip)`} pointerEvents="none" fill="none">
+              <G stroke="#12485A" strokeWidth={1.35} strokeLinecap="round" strokeLinejoin="round" opacity={0.42}>
+                {CORTICAL_FOLDS[id].map((d, index) => <Path key={`${id}-groove-${index}`} d={d} />)}
+              </G>
+              <G transform="translate(-0.45 -0.45)" stroke="#A5DCE8" strokeWidth={0.55} strokeLinecap="round" strokeLinejoin="round" opacity={0.26}>
+                {CORTICAL_FOLDS[id].map((d, index) => <Path key={`${id}-edge-${index}`} d={d} />)}
+              </G>
+              <G stroke="#164B5E" strokeWidth={0.72} strokeLinecap="round" strokeLinejoin="round" opacity={0.2}>
+                {(CORTICAL_FINE_FOLDS[id] ?? []).map((d, index) => <Path key={`${id}-fine-${index}`} d={d} />)}
+              </G>
+            </G>
+          ))}
+
+          {/* A single quiet silhouette edge replaces the heavy white seams. */}
+          <Path d={CEREBRUM_OUTLINE} fill="none" stroke="#24596B" strokeWidth={1.05} strokeOpacity={0.72} pointerEvents="none" />
+
+          {/* Keep region taps reliable even with texture and lighting above the fills.
+              These nearly transparent paths sit on top and preserve each lobe's hit area. */}
+          <G pointerEvents="auto">
+            {(['cerebellum', 'occipital', 'temporal', 'parietal', 'frontal'] as BrainRegionId[]).map((id) => (
+              <Path
+                key={`hit-${id}`}
+                d={PATHS[id]}
+                fill="#FFFFFF"
+                fillOpacity={0.001}
+                stroke="none"
+                onPress={() => select(id)}
+              />
+            ))}
           </G>
         </Svg>
       </Animated.View>

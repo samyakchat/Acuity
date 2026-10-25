@@ -43,6 +43,7 @@ function StaticPage({
       </View>
 
       <Image source={image} style={styles.image} />
+      <View/>
     </View>
   );
 }
@@ -63,7 +64,7 @@ function Welcome({
     <StaticPage
       title="Welcome to your daily test"
       subtitle={`Today you have ${parts.join(" and ")}.`}
-      image={require("@/assets/mochi_stale/mochi_think.svg")}
+      image={require("@/assets/mochi_stale/mochi_welcome.svg")}
       onComplete={onComplete}
     />
   );
@@ -80,7 +81,7 @@ function GameSection({ onComplete }: PageProps) {
     <StaticPage
       title="Welcome to your game section"
       subtitle="Time to have some fun!"
-      image={require("@/assets/mochi_stale/mochi_think.svg")}
+      image={require("@/assets/images/gamelabel.svg")}
       onComplete={onComplete}
     />
   );
@@ -125,8 +126,8 @@ const styles = StyleSheet.create({
     lineHeight: 28,
   },
   image: {
-    width: 210,
-    height: 300,
+    width: 245,
+    height: 350,
     alignSelf: "center",
     objectFit: "contain",
   },
