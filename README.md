@@ -51,7 +51,8 @@ All of this in the same app
 - Daily test details showing what a patient is struggling with and the plan the AI generated for them
 - Easy data metrics to give to healthcare professionals to further medical help
 
-Games:
+Below are screenshots of each game in action or after the game is finished
+
 <img width="295" height="639" alt="IMG_4349" src="https://github.com/user-attachments/assets/6fff4f47-9d16-4dff-a2c1-14635e08ffda" />
 <img width="295" height="639" alt="IMG_4352" src="https://github.com/user-attachments/assets/8cd94ada-b025-4775-b492-7d729f7cc75a" />
 <img width="295" height="639" alt="IMG_4351" src="https://github.com/user-attachments/assets/8510ed93-e39f-4339-b978-8114fe05bd36" />
